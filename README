@@ -1,8 +1,0 @@
-Title:  DiceBag
-Author: Matthew Boyette
-Date:   3/31/2012
-
-This application simulates dice rolls for table top games like Dungeons & Dragons. It accepts input in the form of a string.
-The string should be formatted such that it contains two integers separated by the character 'd'.
-	
-Examples: 3d6, 2d8, 1d20, etc.
