@@ -34,20 +34,20 @@ import javax.swing.KeyStroke;
 
 public class DiceBag
 {
-	private final static Font 		textFont 				= new Font("Lucida Console", Font.PLAIN, 14);
-	private final static String		inputExceptionString	= "Incorrect input format! Provide two non-negative integers separated by the character 'd'." + 
-															  "\nThe 'd' is not case sensitve." + 
-															  "\nExamples: 3d6, 2d8, 1d20, 15D6, 10D10, 4D4, etc.";
+	private final static Font	textFont				= new Font("Lucida Console", Font.PLAIN, 14);
+	private final static String	inputExceptionString	= "Incorrect input format! Provide two non-negative integers separated by the character 'd'." +
+														  "\nThe 'd' is not case sensitve." +
+														  "\nExamples: 3d6, 2d8, 1d20, 15D6, 10D10, 4D4, etc.";
 	
 	public final static void main(final String[] args)
 	{
 		new DiceBag(true);
 	}
 	
-	private boolean				debugMode		= false;
-	private JComboBox<String>	input			= null;
-	private RichTextPane		output			= null;
-	private ApplicationWindow	window			= null;
+	private boolean				debugMode	= false;
+	private JComboBox<String>	input		= null;
+	private RichTextPane		output		= null;
+	private ApplicationWindow	window		= null;
 	
 	public DiceBag(final boolean showWindow)
 	{
@@ -84,27 +84,30 @@ public class DiceBag
 							
 							((DiceBag)this.parent).clearLog();
 							break;
-						
+							
 						case "Combat Tracker":
 							
 							new CombatTracker(((DiceBag)this.parent), ((DiceBag)this.parent).isDebugging());
 							break;
-						
+							
 						case "Open":
 							
 							((DiceBag)this.parent).openLog();
 							break;
-						
+							
 						case "Save":
 							
 							((DiceBag)this.parent).saveLog();
 							break;
-						
+							
 						case "Throw":
 							
-							((DiceBag)this.parent).processInput((String)((DiceBag)this.parent).getInput().getSelectedItem());
+							if (((DiceBag)this.parent).getInput().getSelectedItem() != null)
+							{
+								((DiceBag)this.parent).processInput(((String)((DiceBag)this.parent).getInput().getSelectedItem()).toLowerCase());
+							}
 							break;
-						
+							
 						default:
 							
 							break;
@@ -128,26 +131,26 @@ public class DiceBag
 					throw new IllegalArgumentException("myDrawGUI Error : argument[0] is of incorrect type.");
 				}
 				
-				ApplicationWindow	window		= (ApplicationWindow)arguments[0];
-				Container			contentPane	= window.getContentPane();
-				JMenuBar			menuBar		= new JMenuBar();
-				JMenu				toolsMenu	= new JMenu("Tools");
-				JMenuItem			ctOption	= new JMenuItem("Combat Tracker");
-				JMenu				fileMenu	= new JMenu("File");
-				JMenuItem			clearOption	= new JMenuItem("Clear");
-				JMenuItem			openOption	= new JMenuItem("Open");
-				JMenuItem			saveOption	= new JMenuItem("Save");
-				RichTextPane		outputBox	= new RichTextPane(window, true, window.isDebugging(), textFont);
-				JComboBox<String>	inputBox	= new JComboBox<String>();
-				JButton				inputBtn	= new JButton("Throw");
+				ApplicationWindow window = (ApplicationWindow)arguments[0];
+				Container contentPane = window.getContentPane();
+				JMenuBar menuBar = new JMenuBar();
+				JMenu toolsMenu = new JMenu("Tools");
+				JMenuItem ctOption = new JMenuItem("Combat Tracker");
+				JMenu fileMenu = new JMenu("File");
+				JMenuItem clearOption = new JMenuItem("Clear");
+				JMenuItem openOption = new JMenuItem("Open");
+				JMenuItem saveOption = new JMenuItem("Save");
+				RichTextPane outputBox = new RichTextPane(window, true, window.isDebugging(), DiceBag.textFont);
+				JComboBox<String> inputBox = new JComboBox<String>();
+				JButton inputBtn = new JButton("Throw");
 				
-				menuBar.setFont(textFont);
-				toolsMenu.setFont(textFont);
-				ctOption.setFont(textFont);
-				fileMenu.setFont(textFont);
-				clearOption.setFont(textFont);
-				openOption.setFont(textFont);
-				saveOption.setFont(textFont);
+				menuBar.setFont(DiceBag.textFont);
+				toolsMenu.setFont(DiceBag.textFont);
+				ctOption.setFont(DiceBag.textFont);
+				fileMenu.setFont(DiceBag.textFont);
+				clearOption.setFont(DiceBag.textFont);
+				openOption.setFont(DiceBag.textFont);
+				saveOption.setFont(DiceBag.textFont);
 				contentPane.setLayout(new BorderLayout());
 				clearOption.addActionListener(window);
 				fileMenu.add(clearOption);
@@ -172,13 +175,13 @@ public class DiceBag
 				ctOption.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_M, java.awt.Event.CTRL_MASK));
 				ctOption.setMnemonic('M');
 				
-				JScrollPane	outputPanel	= new JScrollPane(outputBox);
-				JPanel		inputPanel	= new JPanel();
+				JScrollPane outputPanel = new JScrollPane(outputBox);
+				JPanel inputPanel = new JPanel();
 				
 				outputBox.setBackground(Color.WHITE);
-				inputBox.setFont(textFont);
+				inputBox.setFont(DiceBag.textFont);
 				inputBox.setEditable(true);
-				inputBtn.setFont(textFont);
+				inputBtn.setFont(DiceBag.textFont);
 				inputBtn.addActionListener(window);
 				inputPanel.setLayout(new FlowLayout());
 				inputPanel.add(inputBox);
@@ -236,21 +239,21 @@ public class DiceBag
 	
 	public int processInput(final String inputString)
 	{
-		boolean isInputBad 	= true;
-		int 	retVal 		= -1;
+		boolean isInputBad = true;
+		int retVal = -1;
 		
-		if ((inputString.toLowerCase() != null) && (inputString.toLowerCase().isEmpty() == false))
+		if ((inputString != null) && (inputString.isEmpty() == false))
 		{
-			if (inputString.toLowerCase().matches("[0-9]+d[0-9]+"))
+			if (inputString.matches("[0-9]+d[0-9]+"))
 			{
 				if (this.getWindow().isDebugging())
 				{
-					Support.displayDebugMessage(this.getWindow(), "Input: "	+ inputString.toLowerCase() + "\n");
+					Support.displayDebugMessage(this.getWindow(), "Input: " + inputString + "\n");
 				}
 				
-				String[]	paramArray		= inputString.toLowerCase().split("d");
-				int[]		resultsArray	= Games.throwDice(Integer.parseInt(paramArray[0]), Integer.parseInt(paramArray[1]));
-				int			upperBound		= (resultsArray.length - 1);
+				String[] paramArray = inputString.split("d");
+				int[] resultsArray = Games.throwDice(Integer.parseInt(paramArray[0]), Integer.parseInt(paramArray[1]));
+				int upperBound = (resultsArray.length - 1);
 				
 				StringBuilder outputStringBuilder = new StringBuilder();
 				
@@ -272,19 +275,23 @@ public class DiceBag
 					Color.MAGENTA, Color.WHITE, "Sum\t\t", Color.BLACK,
 					Color.WHITE, resultsArray[upperBound] + "\n\n");
 				
-				isInputBad	= false;
-				retVal		= resultsArray[upperBound];
+				isInputBad = false;
+				retVal = resultsArray[upperBound];
+				// TODO: Better duplicate prevention.
+				boolean SelIndEqNegOne = (this.getInput().getSelectedIndex() == -1);
+				boolean isInputSameAsBoxText = true;
+				boolean isNewInput = (SelIndEqNegOne && isInputSameAsBoxText);
 				
-				if (this.getInput().getSelectedIndex() == -1)
+				if (isNewInput)
 				{
-					this.getInput().addItem((String)this.getInput().getSelectedItem());
+					this.getInput().addItem(inputString);
 				}
 			}
 		}
 		
 		if (isInputBad)
 		{
-			Support.displayException(this.getWindow(), new IllegalArgumentException(inputExceptionString), false);
+			Support.displayException(this.getWindow(), new IllegalArgumentException(DiceBag.inputExceptionString), false);
 		}
 		
 		this.getInput().setSelectedIndex(-1);

@@ -28,12 +28,10 @@ import javax.swing.JPanel;
 
 public class CombatTracker
 {
-	private final static Font textFont = new Font("Lucida Console", Font.PLAIN, 14);
-	
 	public static class Creature implements Comparable<Creature>
 	{
 		private int		curHealth	= 0;
-		private DiceBag diceRoller	= null;
+		private DiceBag	diceRoller	= null;
 		private int		initBase	= 0;
 		private int		initBonus	= 0;
 		private int		maxHealth	= 0;
@@ -41,18 +39,6 @@ public class CombatTracker
 		private String	position	= null;
 		private int		tieBreaker	= 0;
 		private int		totalInit	= 0;
-		
-		public Creature(final DiceBag diceBag, final String name, final int initBase, final int initBonus, final int maxHealth, final String position)
-		{
-			this.setDiceRoller(diceBag);
-			this.setCurHealth(maxHealth);
-			this.setInitBase(initBase);
-			this.setInitBonus(initBonus);
-			this.setMaxHealth(maxHealth);
-			this.setName(name);
-			this.setPosition(position);
-			this.setTotalInit(this.getInitBase() + this.getInitBonus());
-		}
 		
 		public Creature(final DiceBag diceBag, final String name, final int curHealth, final int initBase, final int initBonus, final int maxHealth, final String position)
 		{
@@ -66,12 +52,27 @@ public class CombatTracker
 			this.setTotalInit(this.getInitBase() + this.getInitBonus());
 		}
 		
+		public Creature(final DiceBag diceBag, final String name, final int initBase, final int initBonus, final int maxHealth, final String position)
+		{
+			this.setDiceRoller(diceBag);
+			this.setCurHealth(maxHealth);
+			this.setInitBase(initBase);
+			this.setInitBonus(initBonus);
+			this.setMaxHealth(maxHealth);
+			this.setName(name);
+			this.setPosition(position);
+			this.setTotalInit(this.getInitBase() + this.getInitBonus());
+		}
+		
 		@Override
 		public int compareTo(final Creature creature)
 		{
 			if (creature.getTotalInit() == this.getTotalInit())
 			{
-				// TODO: Properly handle ties.
+				creature.getDiceRoller().getOutput().append(Color.BLACK, Color.WHITE, "\t\t\t   Rolling tie-breaker for " + creature.getName() + "...\n");
+				creature.setTieBreaker(this.getDiceRoller().processInput("1d20"));
+				this.getDiceRoller().getOutput().append(Color.BLACK, Color.WHITE, "\t\t\t   Rolling tie-breaker for " + this.getName() + "...\n");
+				this.setTieBreaker(this.getDiceRoller().processInput("1d20"));
 				
 				return (creature.getTieBreaker() - this.getTieBreaker());
 			}
@@ -84,6 +85,97 @@ public class CombatTracker
 			this.setCurHealth(this.getCurHealth() - amount);
 		}
 		
+		/*
+			@see java.lang.Object#equals(java.lang.Object)
+		*/
+		@Override
+		public boolean equals(Object obj)
+		{
+			if (this == obj)
+			{
+				return true;
+			}
+			if (obj == null)
+			{
+				return false;
+			}
+			if (!(obj instanceof Creature))
+			{
+				return false;
+			}
+			
+			Creature other = (Creature)obj;
+			
+			if (this.curHealth != other.curHealth)
+			{
+				return false;
+			}
+			if (this.diceRoller == null)
+			{
+				if (other.diceRoller != null)
+				{
+					return false;
+				}
+			}
+			else
+			{
+				if (!this.diceRoller.equals(other.diceRoller))
+				{
+					return false;
+				}
+			}
+			if (this.initBase != other.initBase)
+			{
+				return false;
+			}
+			if (this.initBonus != other.initBonus)
+			{
+				return false;
+			}
+			if (this.maxHealth != other.maxHealth)
+			{
+				return false;
+			}
+			if (this.name == null)
+			{
+				if (other.name != null)
+				{
+					return false;
+				}
+			}
+			else
+			{
+				if (!this.name.equals(other.name))
+				{
+					return false;
+				}
+			}
+			if (this.position == null)
+			{
+				if (other.position != null)
+				{
+					return false;
+				}
+			}
+			else
+			{
+				if (!this.position.equals(other.position))
+				{
+					return false;
+				}
+			}
+			if (this.tieBreaker != other.tieBreaker)
+			{
+				return false;
+			}
+			if (this.totalInit != other.totalInit)
+			{
+				return false;
+			}
+			
+			return true;
+		}
+
 		public final int getCurHealth()
 		{
 			return this.curHealth;
@@ -93,7 +185,7 @@ public class CombatTracker
 		{
 			return this.diceRoller;
 		}
-
+		
 		public final int getInitBase()
 		{
 			return this.initBase;
@@ -123,10 +215,33 @@ public class CombatTracker
 		{
 			return this.tieBreaker;
 		}
-
+		
 		public final int getTotalInit()
 		{
 			return this.totalInit;
+		}
+		
+		/*
+			@see java.lang.Object#hashCode()
+		*/
+		@Override
+		public int hashCode()
+		{
+			final int prime = 257; // Always prime. Fermat/Pythagorean prime, of the forms (2^(2^3) + 1) and (4n + 1).
+			int result = 89;       // Initially prime.
+			
+			// Use multiplication and XOR to create a high entropy, low collision hash for each object.
+			result = (prime * result) ^ this.curHealth;
+			result = (prime * result) ^ ((this.diceRoller == null) ? 0 : this.diceRoller.hashCode());
+			result = (prime * result) ^ this.initBase;
+			result = (prime * result) ^ this.initBonus;
+			result = (prime * result) ^ this.maxHealth;
+			result = (prime * result) ^ ((this.name == null) ? 0 : this.name.hashCode());
+			result = (prime * result) ^ ((this.position == null) ? 0 : this.position.hashCode());
+			result = (prime * result) ^ this.tieBreaker;
+			result = (prime * result) ^ this.totalInit;
+			
+			return result;
 		}
 		
 		public void heal(final int amount)
@@ -139,11 +254,11 @@ public class CombatTracker
 			this.curHealth = curHealth;
 		}
 		
-		public final void setDiceRoller(DiceBag diceRoller)
+		public final void setDiceRoller(final DiceBag diceRoller)
 		{
 			this.diceRoller = diceRoller;
 		}
-
+		
 		public final void setInitBase(final int initBase)
 		{
 			this.initBase = initBase;
@@ -169,16 +284,17 @@ public class CombatTracker
 			this.position = position;
 		}
 		
-		public final void setTieBreaker(int tieBreaker)
+		public final void setTieBreaker(final int tieBreaker)
 		{
 			this.tieBreaker = tieBreaker;
 		}
-
+		
 		public final void setTotalInit(final int totalInit)
 		{
 			this.totalInit = totalInit;
 		}
 		
+		@Override
 		public String toString()
 		{
 			String s;
@@ -190,11 +306,14 @@ public class CombatTracker
 		}
 	}
 	
+	public final static Font		textFont			= new Font("Lucida Console", Font.PLAIN, 14);
+	public final static String		windowTitle			= "Combat Tracker" + " - " + "Round: ";
+	
 	private JComboBox<Creature>		cboCreatureList		= null;
 	private LinkedList<Creature>	creatureList		= null;
 	private Creature				curCreature			= null;
 	private boolean					isDebugging			= false;
-	private JLabel					lblCurrentCreature  = null;
+	private JLabel					lblCurrentCreature	= null;
 	private int						numEnemyTypes		= 0;
 	private int						numPlayers			= 0;
 	private int						numRounds			= 0;
@@ -227,7 +346,7 @@ public class CombatTracker
 		this.setNumEnemyTypes(Integer.parseInt(s));
 		
 		for (int i = 1; i <= this.getNumPlayers(); i++)
-		{	
+		{
 			String name = this.getInputString("What is player " + i + "'s character name?", "Combat Setup");
 			
 			do
@@ -257,7 +376,7 @@ public class CombatTracker
 			this.parent.getOutput().append(Color.BLACK, Color.WHITE, "\t\t\t   Rolling initiative for " + name + "...\n");
 			int initBase = this.parent.processInput("1d20");
 			
-			String position; 
+			String position;
 			
 			do
 			{
@@ -315,7 +434,6 @@ public class CombatTracker
 		}
 		
 		Collections.sort(this.getCreatureList());
-		
 		this.setCurrentCreature(this.getCreatureList().getFirst());
 		
 		// Define a self-contained ActionListener event handler.
@@ -333,8 +451,8 @@ public class CombatTracker
 					throw new IllegalArgumentException("myActionPerformed Error : argument[0] is of incorrect type.");
 				}
 				
-				ActionEvent	event		= (ActionEvent)arguments[0];
-				Creature	creature	= null;
+				ActionEvent event = (ActionEvent)arguments[0];
+				Creature creature = null;
 				
 				if (((CombatTracker)this.parent).getCboCreatureList() != null)
 				{
@@ -352,7 +470,22 @@ public class CombatTracker
 						
 						if (creature != null)
 						{
-							// TODO: Add damage button code.
+							String amount;
+							
+							do
+							{
+								amount = ((CombatTracker)this.parent).getInputString("How much?", "Damage " + creature.getName());
+							}
+							while (Support.isStringParsedAsInteger(amount) != true);
+							
+							creature.setCurHealth(creature.getCurHealth() - Integer.parseInt(amount));
+							
+							if (creature.getCurHealth() < 1)
+							{
+								((CombatTracker)this.parent).getCreatureList().remove(creature);
+							}
+							
+							((CombatTracker)this.parent).getWindow().reDrawGUI();
 						}
 						break;
 						
@@ -360,7 +493,22 @@ public class CombatTracker
 						
 						if (creature != null)
 						{
-							// TODO: Add heal button code.
+							String amount;
+							
+							do
+							{
+								amount = ((CombatTracker)this.parent).getInputString("How much?", "Heal " + creature.getName());
+							}
+							while (Support.isStringParsedAsInteger(amount) != true);
+							
+							creature.setCurHealth(creature.getCurHealth() + Integer.parseInt(amount));
+							
+							if (creature.getCurHealth() > creature.getMaxHealth())
+							{
+								creature.setCurHealth(creature.getMaxHealth());
+							}
+							
+							((CombatTracker)this.parent).getWindow().reDrawGUI();
 						}
 						break;
 						
@@ -368,7 +516,17 @@ public class CombatTracker
 						
 						if (creature != null)
 						{
-							// TODO: Add move button code.
+							String position;
+							
+							do
+							{
+								position = ((CombatTracker)this.parent).getInputString("Where to?", "Move " + creature.getName());
+							}
+							while (!position.matches("[0-9]+,[0-9]+"));
+							
+							creature.setPosition(position);
+							
+							((CombatTracker)this.parent).getWindow().reDrawGUI();
 						}
 						break;
 						
@@ -400,34 +558,34 @@ public class CombatTracker
 					throw new IllegalArgumentException("myDrawGUI Error : argument[0] is of incorrect type.");
 				}
 				
-				ApplicationWindow	window			= (ApplicationWindow)arguments[0];
-				JButton				btnDamage		= new JButton("Damage");
-				JButton				btnHeal			= new JButton("Heal");
-				JButton				btnMove			= new JButton("Move");
-				JButton				btnNext			= new JButton("Next");
-				JPanel				buttonPanel     = new JPanel();
-				JPanel				cboPanel		= new JPanel();
-				CombatTracker		combatTracker	= (CombatTracker)this.parent;
-				Container			contentPane		= window.getContentPane();
-				JPanel				curPanel		= new JPanel();
+				ApplicationWindow window = (ApplicationWindow)arguments[0];
+				JButton btnDamage = new JButton("Damage");
+				JButton btnHeal = new JButton("Heal");
+				JButton btnMove = new JButton("Move");
+				JButton btnNext = new JButton("Next");
+				JPanel buttonPanel = new JPanel();
+				JPanel cboPanel = new JPanel();
+				CombatTracker combatTracker = (CombatTracker)this.parent;
+				Container contentPane = window.getContentPane();
+				JPanel curPanel = new JPanel();
 				
-				btnDamage.setFont(textFont);
+				btnDamage.setFont(CombatTracker.textFont);
 				btnDamage.addActionListener(window);
-				btnHeal.setFont(textFont);
+				btnHeal.setFont(CombatTracker.textFont);
 				btnHeal.addActionListener(window);
-				btnMove.setFont(textFont);
+				btnMove.setFont(CombatTracker.textFont);
 				btnMove.addActionListener(window);
-				btnNext.setFont(textFont);
+				btnNext.setFont(CombatTracker.textFont);
 				btnNext.addActionListener(window);
 				buttonPanel.setLayout(new FlowLayout());
 				buttonPanel.add(btnDamage);
 				buttonPanel.add(btnHeal);
 				buttonPanel.add(btnMove);
 				combatTracker.setCboCreatureList(new JComboBox<Creature>());
-				combatTracker.getCboCreatureList().setFont(textFont);
+				combatTracker.getCboCreatureList().setFont(CombatTracker.textFont);
 				combatTracker.getCboCreatureList().setEditable(false);
 				combatTracker.setLblCurrentCreature(new JLabel("Current: " + combatTracker.getCurrentCreature().toString()));
-				combatTracker.getLblCurrentCreature().setFont(textFont);
+				combatTracker.getLblCurrentCreature().setFont(CombatTracker.textFont);
 				cboPanel.setLayout(new FlowLayout());
 				cboPanel.add(combatTracker.getCboCreatureList());
 				curPanel.setLayout(new FlowLayout());
@@ -442,27 +600,25 @@ public class CombatTracker
 				{
 					combatTracker.getCboCreatureList().addItem(combatTracker.getCreatureList().get(i));
 				}
+				
+				combatTracker.getCboCreatureList().setSelectedIndex(combatTracker.getCreatureList().indexOf(combatTracker.getCurrentCreature()));
+				window.setTitle(CombatTracker.windowTitle + combatTracker.getNumRounds());
 			}
 		};
 		
-		this.setCombatTrackerWindow(new ApplicationWindow(this.getParent().getWindow(), "Combat Tracker" + " - " + "Round: " + this.getNumRounds(),
+		this.setWindow(new ApplicationWindow(this.getParent().getWindow(), CombatTracker.windowTitle + this.getNumRounds(),
 			new Dimension(1000, 120), this.isDebugging(), false, myActionPerformed, myDrawGUI));
-		this.getCombatTrackerWindow().setIconImageByResourceName("icon.png");
+		this.getWindow().setIconImageByResourceName("icon.png");
 	}
 	
 	public final JComboBox<Creature> getCboCreatureList()
 	{
 		return this.cboCreatureList;
 	}
-
-	public final ApplicationWindow getCombatTrackerWindow()
+	
+	public final ApplicationWindow getWindow()
 	{
 		return this.window;
-	}
-	
-	public final Creature getCurrentCreature()
-	{
-		return this.curCreature;
 	}
 	
 	public final LinkedList<Creature> getCreatureList()
@@ -470,14 +626,19 @@ public class CombatTracker
 		return this.creatureList;
 	}
 	
+	public final Creature getCurrentCreature()
+	{
+		return this.curCreature;
+	}
+	
 	public final String getInputString(final String message, final String title)
 	{
-		ApplicationWindow	windowHandle	= null;
-		String				s				= null;
+		ApplicationWindow windowHandle = null;
+		String s = null;
 		
-		if (this.getCombatTrackerWindow() != null)
+		if (this.getWindow() != null)
 		{
-			windowHandle = this.getCombatTrackerWindow();
+			windowHandle = this.getWindow();
 		}
 		else
 		{
@@ -497,7 +658,7 @@ public class CombatTracker
 	{
 		return this.lblCurrentCreature;
 	}
-
+	
 	public final int getNumEnemyTypes()
 	{
 		return this.numEnemyTypes;
@@ -517,7 +678,7 @@ public class CombatTracker
 	{
 		return this.parent;
 	}
-
+	
 	public final boolean isDebugging()
 	{
 		return this.isDebugging;
@@ -525,34 +686,26 @@ public class CombatTracker
 	
 	public void nextCombatant()
 	{
-		int index = this.getCreatureList().indexOf(this.getCurrentCreature());
-		
-		index++;
+		int index = (this.getCreatureList().indexOf(this.getCurrentCreature()) + 1);
 		
 		if (index >= this.getCreatureList().size())
 		{
 			this.setNumRounds(this.getNumRounds() + 1);
-			this.getCombatTrackerWindow().setTitle("Combat Tracker" + " - " + "Round: " + this.getNumRounds());
 			index = 0;
 		}
 		
 		this.setCurrentCreature(this.getCreatureList().get(index));
-		this.getCombatTrackerWindow().reDrawGUI();
+		this.getWindow().reDrawGUI();
 	}
 	
-	public final void setCboCreatureList(JComboBox<Creature> cboCreatureList)
+	public final void setCboCreatureList(final JComboBox<Creature> cboCreatureList)
 	{
 		this.cboCreatureList = cboCreatureList;
 	}
-
-	public final void setCombatTrackerWindow(final ApplicationWindow combatTrackerWindow)
-	{
-		this.window = combatTrackerWindow;
-	}
 	
-	public final void setCurrentCreature(final Creature creature)
+	public final void setWindow(final ApplicationWindow window)
 	{
-		this.curCreature = creature;
+		this.window = window;
 	}
 	
 	public final void setCreatureList(final LinkedList<Creature> creatureList)
@@ -560,16 +713,21 @@ public class CombatTracker
 		this.creatureList = creatureList;
 	}
 	
+	public final void setCurrentCreature(final Creature creature)
+	{
+		this.curCreature = creature;
+	}
+	
 	public final void setDebugging(final boolean isDebugging)
 	{
 		this.isDebugging = isDebugging;
 	}
 	
-	public final void setLblCurrentCreature(JLabel lblCurrentCreature)
+	public final void setLblCurrentCreature(final JLabel lblCurrentCreature)
 	{
 		this.lblCurrentCreature = lblCurrentCreature;
 	}
-
+	
 	public final void setNumEnemyTypes(final int numEnemyTypes)
 	{
 		this.numEnemyTypes = numEnemyTypes;
@@ -584,8 +742,8 @@ public class CombatTracker
 	{
 		this.numRounds = numRounds;
 	}
-
-	public final void setParent(DiceBag parent)
+	
+	public final void setParent(final DiceBag parent)
 	{
 		this.parent = parent;
 	}
