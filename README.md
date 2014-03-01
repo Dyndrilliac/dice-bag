@@ -12,6 +12,8 @@ This application simulates dice rolls for table top games like Dungeons & Dragon
 	
 Examples: 3d6, 2d8, 1d20, 15D6, 10D10, 4D4, etc.
 
+A compiled JAR binary can be downloaded from [this link](https://db.tt/ONZwv8k8).
+
 *******************************************************************
 
 * Title:  CombatTracker (DiceBag Add-on)
