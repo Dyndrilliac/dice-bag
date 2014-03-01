@@ -469,7 +469,7 @@ public class CombatTracker
 					case "Damage":
 						
 						if (creature != null)
-						{
+						{// TODO: Fix case when removing the current creature and then trying to advance to the next turn.
 							String amount;
 							
 							do
@@ -685,7 +685,7 @@ public class CombatTracker
 	}
 	
 	public void nextCombatant()
-	{
+	{// TODO: Fix case when removing the current creature and then trying to advance to the next turn.
 		int index = (this.getCreatureList().indexOf(this.getCurrentCreature()) + 1);
 		
 		if (index >= this.getCreatureList().size())

@@ -22,6 +22,7 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JMenu;
@@ -48,6 +49,19 @@ public class DiceBag
 	private JComboBox<String>	input		= null;
 	private RichTextPane		output		= null;
 	private ApplicationWindow	window		= null;
+	
+	public final static class UniqueComboBoxModel extends DefaultComboBoxModel<String>
+	{
+		private static final long	serialVersionUID	= 1L;
+		
+		public void addElement(String s)
+		{  
+			if (this.getIndexOf(s) == -1)
+			{
+				super.addElement(s);
+			}
+	    }
+	}
 	
 	public DiceBag(final boolean showWindow)
 	{
@@ -102,7 +116,9 @@ public class DiceBag
 							
 						case "Throw":
 							
-							if (((DiceBag)this.parent).getInput().getSelectedItem() != null)
+							Object obj = ((DiceBag)this.parent).getInput().getSelectedItem();
+							
+							if ((obj != null) && (((String)obj).isEmpty() == false))
 							{
 								((DiceBag)this.parent).processInput(((String)((DiceBag)this.parent).getInput().getSelectedItem()).toLowerCase());
 							}
@@ -179,8 +195,9 @@ public class DiceBag
 				JPanel inputPanel = new JPanel();
 				
 				outputBox.setBackground(Color.WHITE);
-				inputBox.setFont(DiceBag.textFont);
 				inputBox.setEditable(true);
+				inputBox.setFont(DiceBag.textFont);
+				inputBox.setModel(new UniqueComboBoxModel());
 				inputBtn.setFont(DiceBag.textFont);
 				inputBtn.addActionListener(window);
 				inputPanel.setLayout(new FlowLayout());
@@ -195,7 +212,7 @@ public class DiceBag
 			}
 		};
 		
-		this.setWindow(new ApplicationWindow(null, "Dice Bag", new Dimension(1000, 575), this.isDebugging(), false, myActionPerformed, myDrawGUI));
+		this.setWindow(new ApplicationWindow(null, "Dice Bag", new Dimension(800, 600), this.isDebugging(), false, myActionPerformed, myDrawGUI));
 		this.getWindow().setIconImageByResourceName("icon.png");
 		
 		if (!showWindow)
@@ -277,15 +294,7 @@ public class DiceBag
 				
 				isInputBad = false;
 				retVal = resultsArray[upperBound];
-				// TODO: Better duplicate prevention.
-				boolean SelIndEqNegOne = (this.getInput().getSelectedIndex() == -1);
-				boolean isInputSameAsBoxText = true;
-				boolean isNewInput = (SelIndEqNegOne && isInputSameAsBoxText);
-				
-				if (isNewInput)
-				{
-					this.getInput().addItem(inputString);
-				}
+				this.getInput().addItem(inputString);
 			}
 		}
 		
