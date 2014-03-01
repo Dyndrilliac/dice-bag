@@ -312,6 +312,7 @@ public class CombatTracker
 	private JComboBox<Creature>		cboCreatureList		= null;
 	private LinkedList<Creature>	creatureList		= null;
 	private Creature				curCreature			= null;
+	private int						curCreatureIndex	= 0;
 	private boolean					isDebugging			= false;
 	private JLabel					lblCurrentCreature	= null;
 	private int						numEnemyTypes		= 0;
@@ -324,117 +325,7 @@ public class CombatTracker
 	{
 		this.setParent(parent);
 		this.setDebugging(isDebugging);
-		this.setNumRounds(1);
-		this.setCreatureList(new LinkedList<Creature>());
-		
-		String s = null;
-		
-		do
-		{
-			s = this.getInputString("How many players are there?", "Combat Setup");
-		}
-		while (Support.isStringParsedAsInteger(s) != true);
-		
-		this.setNumPlayers(Integer.parseInt(s));
-		
-		do
-		{
-			s = this.getInputString("How many enemy types are there?", "Combat Setup");
-		}
-		while (Support.isStringParsedAsInteger(s) != true);
-		
-		this.setNumEnemyTypes(Integer.parseInt(s));
-		
-		for (int i = 1; i <= this.getNumPlayers(); i++)
-		{
-			String name = this.getInputString("What is player " + i + "'s character name?", "Combat Setup");
-			
-			do
-			{
-				s = this.getInputString("What is player " + i + "'s current health?", "Combat Setup");
-			}
-			while (Support.isStringParsedAsInteger(s) != true);
-			
-			int curHealth = Integer.parseInt(s);
-			
-			do
-			{
-				s = this.getInputString("What is player " + i + "'s maximum health?", "Combat Setup");
-			}
-			while (Support.isStringParsedAsInteger(s) != true);
-			
-			int maxHealth = Integer.parseInt(s);
-			
-			do
-			{
-				s = this.getInputString("What is player " + i + "'s initiative modifier?", "Combat Setup");
-			}
-			while (Support.isStringParsedAsInteger(s) != true);
-			
-			int initBonus = Integer.parseInt(s);
-			
-			this.parent.getOutput().append(Color.BLACK, Color.WHITE, "\t\t\t   Rolling initiative for " + name + "...\n");
-			int initBase = this.parent.processInput("1d20");
-			
-			String position;
-			
-			do
-			{
-				position = this.getInputString("What is player " + i + "'s battle grid position?", "Combat Setup");
-			}
-			while (!position.matches("[0-9]+,[0-9]+"));
-			
-			Creature player = new Creature(this.getParent(), name, curHealth, initBase, initBonus, maxHealth, position);
-			this.getCreatureList().add(player);
-		}
-		
-		for (int i = 1; i <= this.getNumEnemyTypes(); i++)
-		{
-			do
-			{
-				s = this.getInputString("How many enemies are there of type " + i + "?", "Combat Setup");
-			}
-			while (Support.isStringParsedAsInteger(s) != true);
-			
-			int numEnemies = Integer.parseInt(s);
-			
-			String name = this.getInputString("What is enemy type " + i + "'s name?", "Combat Setup");
-			
-			do
-			{
-				s = this.getInputString("What is enemy type " + i + "'s maximum health?", "Combat Setup");
-			}
-			while (Support.isStringParsedAsInteger(s) != true);
-			
-			int maxHealth = Integer.parseInt(s);
-			
-			do
-			{
-				s = this.getInputString("What is enemy type " + i + "'s initiative modifier?", "Combat Setup");
-			}
-			while (Support.isStringParsedAsInteger(s) != true);
-			
-			int initBonus = Integer.parseInt(s);
-			
-			for (int j = 1; j <= numEnemies; j++)
-			{
-				String position;
-				
-				do
-				{
-					position = this.getInputString("What is " + name + " " + j + "'s battle grid position?", "Combat Setup");
-				}
-				while (!position.matches("[0-9]+,[0-9]+"));
-				
-				this.parent.getOutput().append(Color.BLACK, Color.WHITE, "\t\t\t   Rolling initiative for " + name + " " + j + "...\n");
-				int initBase = this.parent.processInput("1d20");
-				Creature enemy = new Creature(this.getParent(), name + " " + j, initBase, initBonus, maxHealth, position);
-				this.getCreatureList().add(enemy);
-			}
-		}
-		
-		Collections.sort(this.getCreatureList());
-		this.setCurrentCreature(this.getCreatureList().getFirst());
+		this.reset();
 		
 		// Define a self-contained ActionListener event handler.
 		EventHandler myActionPerformed = new EventHandler(this)
@@ -469,12 +360,12 @@ public class CombatTracker
 					case "Damage":
 						
 						if (creature != null)
-						{// TODO: Fix case when removing the current creature and then trying to advance to the next turn.
+						{
 							String amount;
 							
 							do
 							{
-								amount = ((CombatTracker)this.parent).getInputString("How much?", "Damage " + creature.getName());
+								amount = ((CombatTracker)this.parent).getInputString("How much? Enter zero to cancel.", "Damage " + creature.getName());
 							}
 							while (Support.isStringParsedAsInteger(amount) != true);
 							
@@ -497,7 +388,7 @@ public class CombatTracker
 							
 							do
 							{
-								amount = ((CombatTracker)this.parent).getInputString("How much?", "Heal " + creature.getName());
+								amount = ((CombatTracker)this.parent).getInputString("How much? Enter zero to cancel.", "Heal " + creature.getName());
 							}
 							while (Support.isStringParsedAsInteger(amount) != true);
 							
@@ -520,7 +411,9 @@ public class CombatTracker
 							
 							do
 							{
-								position = ((CombatTracker)this.parent).getInputString("Where to?", "Move " + creature.getName());
+								position = ((CombatTracker)this.parent).getInputString("Where to? Prompt expects X,Y coordinates." +
+																					   "\nEnter " + creature.getPosition() + " to cancel.",
+																					   "Move " + creature.getName());
 							}
 							while (!position.matches("[0-9]+,[0-9]+"));
 							
@@ -533,6 +426,12 @@ public class CombatTracker
 					case "Next":
 						
 						((CombatTracker)this.parent).nextCombatant();
+						break;
+						
+					case "Reset":
+						
+						((CombatTracker)this.parent).reset();
+						((CombatTracker)this.parent).getWindow().reDrawGUI();
 						break;
 						
 					default:
@@ -631,6 +530,11 @@ public class CombatTracker
 		return this.curCreature;
 	}
 	
+	public final int getCurCreatureIndex()
+	{
+		return this.curCreatureIndex;
+	}
+	
 	public final String getInputString(final String message, final String title)
 	{
 		ApplicationWindow windowHandle = null;
@@ -685,8 +589,17 @@ public class CombatTracker
 	}
 	
 	public void nextCombatant()
-	{// TODO: Fix case when removing the current creature and then trying to advance to the next turn.
-		int index = (this.getCreatureList().indexOf(this.getCurrentCreature()) + 1);
+	{
+		int index;
+		
+		if (this.getCreatureList().indexOf(this.getCurrentCreature()) == -1)
+		{
+			index = this.getCurCreatureIndex();
+		}
+		else
+		{
+			index = (this.getCurCreatureIndex() + 1);
+		}
 		
 		if (index >= this.getCreatureList().size())
 		{
@@ -694,8 +607,127 @@ public class CombatTracker
 			index = 0;
 		}
 		
+		this.setCurCreatureIndex(index);
 		this.setCurrentCreature(this.getCreatureList().get(index));
 		this.getWindow().reDrawGUI();
+	}
+	
+	public void reset()
+	{
+		this.setNumRounds(1);
+		this.setCreatureList(new LinkedList<Creature>());
+		
+		String s = null;
+		
+		do
+		{
+			s = this.getInputString("How many players are there?", "Combat Setup");
+		}
+		while (Support.isStringParsedAsInteger(s) != true);
+		
+		this.setNumPlayers(Integer.parseInt(s));
+		
+		do
+		{
+			s = this.getInputString("How many enemy types are there?", "Combat Setup");
+		}
+		while (Support.isStringParsedAsInteger(s) != true);
+		
+		this.setNumEnemyTypes(Integer.parseInt(s));
+		
+		for (int i = 1; i <= this.getNumPlayers(); i++)
+		{
+			String name = this.getInputString("What is player " + i + "'s character name?", "Combat Setup");
+			
+			do
+			{
+				s = this.getInputString("What is player " + i + "'s current health?", "Combat Setup");
+			}
+			while (Support.isStringParsedAsInteger(s) != true);
+			
+			int curHealth = Integer.parseInt(s);
+			
+			do
+			{
+				s = this.getInputString("What is player " + i + "'s maximum health?", "Combat Setup");
+			}
+			while (Support.isStringParsedAsInteger(s) != true);
+			
+			int maxHealth = Integer.parseInt(s);
+			
+			do
+			{
+				s = this.getInputString("What is player " + i + "'s initiative modifier?", "Combat Setup");
+			}
+			while (Support.isStringParsedAsInteger(s) != true);
+			
+			int initBonus = Integer.parseInt(s);
+			
+			this.parent.getOutput().append(Color.BLACK, Color.WHITE, "\t\t\t   Rolling initiative for " + name + "...\n");
+			int initBase = this.parent.processInput("1d20");
+			
+			String position;
+			
+			do
+			{
+				position = this.getInputString("What is player " + i + "'s battle grid position?" +
+					   						   "\nPrompt expects X,Y coordinates.", "Combat Setup");
+			}
+			while (!position.matches("[0-9]+,[0-9]+"));
+			
+			Creature player = new Creature(this.getParent(), name, curHealth, initBase, initBonus, maxHealth, position);
+			this.getCreatureList().add(player);
+		}
+		
+		for (int i = 1; i <= this.getNumEnemyTypes(); i++)
+		{
+			do
+			{
+				s = this.getInputString("How many enemies are there of type " + i + "?", "Combat Setup");
+			}
+			while (Support.isStringParsedAsInteger(s) != true);
+			
+			int numEnemies = Integer.parseInt(s);
+			
+			String name = this.getInputString("What is enemy type " + i + "'s name?", "Combat Setup");
+			
+			do
+			{
+				s = this.getInputString("What is enemy type " + i + "'s maximum health?", "Combat Setup");
+			}
+			while (Support.isStringParsedAsInteger(s) != true);
+			
+			int maxHealth = Integer.parseInt(s);
+			
+			do
+			{
+				s = this.getInputString("What is enemy type " + i + "'s initiative modifier?", "Combat Setup");
+			}
+			while (Support.isStringParsedAsInteger(s) != true);
+			
+			int initBonus = Integer.parseInt(s);
+			
+			for (int j = 1; j <= numEnemies; j++)
+			{
+				String position;
+				
+				do
+				{
+					position = this.getInputString("What is " + name + " " + j + "'s battle grid position?" +
+												   "\nPrompt expects X,Y coordinates.", "Combat Setup");
+				}
+				while (!position.matches("[0-9]+,[0-9]+"));
+				
+				this.parent.getOutput().append(Color.BLACK, Color.WHITE, "\t\t\t   Rolling initiative for " + name + " " + j + "...\n");
+				int initBase = this.parent.processInput("1d20");
+				Creature enemy = new Creature(this.getParent(), name + " " + j, initBase, initBonus, maxHealth, position);
+				this.getCreatureList().add(enemy);
+			}
+		}
+		
+		Collections.sort(this.getCreatureList());
+		this.setCurrentCreature(this.getCreatureList().getFirst());
+		this.setCurCreatureIndex(this.getCreatureList().indexOf(this.getCurrentCreature()));
 	}
 	
 	public final void setCboCreatureList(final JComboBox<Creature> cboCreatureList)
@@ -716,6 +748,11 @@ public class CombatTracker
 	public final void setCurrentCreature(final Creature creature)
 	{
 		this.curCreature = creature;
+	}
+	
+	public final void setCurCreatureIndex(final int curCreatureIndex)
+	{
+		this.curCreatureIndex = curCreatureIndex;
 	}
 	
 	public final void setDebugging(final boolean isDebugging)
