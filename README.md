@@ -2,7 +2,7 @@
 
 * Title:  DiceBag
 * Author: [Matthew Boyette](mailto:Dyndrilliac@gmail.com)
-* Date:   2/19/2014
+* Date:   3/31/2012
 
 *******************************************************************
 
@@ -12,13 +12,13 @@ This application simulates dice rolls for table top games like Dungeons & Dragon
 	
 Examples: 3d6, 2d8, 1d20, 15D6, 10D10, 4D4, etc.
 
-A compiled JAR binary can be downloaded from [this link](https://db.tt/ONZwv8k8).
+A pre-compiled JAR binary can be downloaded from [this link](https://db.tt/ONZwv8k8).
 
 *******************************************************************
 
 * Title:  CombatTracker (DiceBag Add-on)
 * Author: [Matthew Boyette](mailto:Dyndrilliac@gmail.com)
-* Date:   3/31/2012
+* Date:   2/19/2014
 
 *******************************************************************
 
