@@ -65,19 +65,34 @@ public class CombatTracker
 		}
 		
 		@Override
+		// Implements initiative as the natural ordering mechanism for the Creature class.
+		// See d20 SRD Initiative rules: http://www.d20srd.org/srd/combat/initiative.htm
 		public int compareTo(final Creature creature)
 		{
 			if (creature.getTotalInit() == this.getTotalInit())
 			{
-				creature.getDiceRoller().getOutput().append(Color.BLACK, Color.WHITE, "\t\t\t   Rolling tie-breaker for " + creature.getName() + "...\n");
-				creature.setTieBreaker(this.getDiceRoller().processInput("1d20"));
-				this.getDiceRoller().getOutput().append(Color.BLACK, Color.WHITE, "\t\t\t   Rolling tie-breaker for " + this.getName() + "...\n");
-				this.setTieBreaker(this.getDiceRoller().processInput("1d20"));
-				
-				return (creature.getTieBreaker() - this.getTieBreaker());
+				if (creature.getInitBonus() == this.getInitBonus())
+				{
+					do
+					{
+						creature.getDiceRoller().getOutput().append(Color.BLACK, Color.WHITE, "\t\t\t   Rolling tie-breaker for " + creature.getName() + "...\n");
+						creature.setTieBreaker(this.getDiceRoller().processInput("1d20"));
+						this.getDiceRoller().getOutput().append(Color.BLACK, Color.WHITE, "\t\t\t   Rolling tie-breaker for " + this.getName() + "...\n");
+						this.setTieBreaker(this.getDiceRoller().processInput("1d20"));
+					}
+					while (creature.getTieBreaker() == this.getTieBreaker());
+					
+					return (creature.getTieBreaker() - this.getTieBreaker());
+				}
+				else
+				{
+					return (creature.getInitBonus() - this.getInitBonus());
+				}
 			}
-			
-			return (creature.getTotalInit() - this.getTotalInit());
+			else
+			{
+				return (creature.getTotalInit() - this.getTotalInit());
+			}
 		}
 		
 		public void damage(final int amount)
@@ -462,6 +477,7 @@ public class CombatTracker
 				JButton btnHeal = new JButton("Heal");
 				JButton btnMove = new JButton("Move");
 				JButton btnNext = new JButton("Next");
+				JButton btnReset = new JButton("Reset");
 				JPanel buttonPanel = new JPanel();
 				JPanel cboPanel = new JPanel();
 				CombatTracker combatTracker = (CombatTracker)this.parent;
@@ -476,6 +492,8 @@ public class CombatTracker
 				btnMove.addActionListener(window);
 				btnNext.setFont(CombatTracker.textFont);
 				btnNext.addActionListener(window);
+				btnReset.setFont(CombatTracker.textFont);
+				btnReset.addActionListener(window);
 				buttonPanel.setLayout(new FlowLayout());
 				buttonPanel.add(btnDamage);
 				buttonPanel.add(btnHeal);
@@ -490,6 +508,7 @@ public class CombatTracker
 				curPanel.setLayout(new FlowLayout());
 				curPanel.add(combatTracker.getLblCurrentCreature());
 				curPanel.add(btnNext);
+				curPanel.add(btnReset);
 				contentPane.setLayout(new BorderLayout());
 				contentPane.add(curPanel, BorderLayout.NORTH);
 				contentPane.add(cboPanel, BorderLayout.CENTER);

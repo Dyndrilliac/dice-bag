@@ -212,7 +212,7 @@ public class DiceBag
 			}
 		};
 		
-		this.setWindow(new ApplicationWindow(null, "Dice Bag", new Dimension(800, 600), this.isDebugging(), false, myActionPerformed, myDrawGUI));
+		this.setWindow(new ApplicationWindow(null, "Dice Bag", new Dimension(1000, 580), this.isDebugging(), false, myActionPerformed, myDrawGUI));
 		this.getWindow().setIconImageByResourceName("icon.png");
 		
 		if (!showWindow)
