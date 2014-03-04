@@ -380,7 +380,7 @@ public class CombatTracker
 							
 							do
 							{
-								amount = ((CombatTracker)this.parent).getInputString("How much? Enter zero to cancel.", "Damage " + creature.getName());
+								amount = ((CombatTracker)this.parent).getInputString("How much?\nEnter zero to cancel.", "Damage " + creature.getName());
 							}
 							while (Support.isStringParsedAsInteger(amount) != true);
 							
@@ -403,7 +403,7 @@ public class CombatTracker
 							
 							do
 							{
-								amount = ((CombatTracker)this.parent).getInputString("How much? Enter zero to cancel.", "Heal " + creature.getName());
+								amount = ((CombatTracker)this.parent).getInputString("How much?\nEnter zero to cancel.", "Heal " + creature.getName());
 							}
 							while (Support.isStringParsedAsInteger(amount) != true);
 							
@@ -426,11 +426,11 @@ public class CombatTracker
 							
 							do
 							{
-								position = ((CombatTracker)this.parent).getInputString("Where to? Prompt expects X,Y coordinates." +
+								position = ((CombatTracker)this.parent).getInputString("Where to? Prompt expects X:YY coordinates." +
 																					   "\nEnter " + creature.getPosition() + " to cancel.",
 																					   "Move " + creature.getName());
 							}
-							while (!position.matches("[0-9]+,[0-9]+"));
+							while (!position.matches("[1-9]:[0-9][0-9]"));
 							
 							creature.setPosition(position);
 							
@@ -690,9 +690,9 @@ public class CombatTracker
 			do
 			{
 				position = this.getInputString("What is player " + i + "'s battle grid position?" +
-					   						   "\nPrompt expects X,Y coordinates.", "Combat Setup");
+					   						   "\nPrompt expects X:YY coordinates.", "Combat Setup");
 			}
-			while (!position.matches("[0-9]+,[0-9]+"));
+			while (!position.matches("[1-9]:[0-9][0-9]"));
 			
 			Creature player = new Creature(this.getParent(), name, curHealth, initBase, initBonus, maxHealth, position);
 			this.getCreatureList().add(player);
@@ -733,9 +733,9 @@ public class CombatTracker
 				do
 				{
 					position = this.getInputString("What is " + name + " " + j + "'s battle grid position?" +
-												   "\nPrompt expects X,Y coordinates.", "Combat Setup");
+												   "\nPrompt expects X:YY coordinates.", "Combat Setup");
 				}
-				while (!position.matches("[0-9]+,[0-9]+"));
+				while (!position.matches("[1-9]:[0-9][0-9]"));
 				
 				this.parent.getOutput().append(Color.BLACK, Color.WHITE, "\t\t\t   Rolling initiative for " + name + " " + j + "...\n");
 				int initBase = this.parent.processInput("1d20");
