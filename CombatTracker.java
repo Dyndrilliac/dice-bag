@@ -23,7 +23,6 @@ import java.util.LinkedList;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 public class CombatTracker
@@ -557,7 +556,6 @@ public class CombatTracker
 	public final String getInputString(final String message, final String title)
 	{
 		ApplicationWindow windowHandle = null;
-		String s = null;
 		
 		if (this.getWindow() != null)
 		{
@@ -568,13 +566,7 @@ public class CombatTracker
 			windowHandle = this.getParent().getWindow();
 		}
 		
-		do
-		{
-			s = JOptionPane.showInputDialog(windowHandle, message, title, JOptionPane.INFORMATION_MESSAGE);
-		}
-		while ((s == null) || s.isEmpty());
-		
-		return s;
+		return Support.getInputString(windowHandle, message, title);
 	}
 	
 	public final JLabel getLblCurrentCreature()
