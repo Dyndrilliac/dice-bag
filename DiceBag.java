@@ -279,18 +279,17 @@ public class DiceBag
 					outputStringBuilder.append(resultsArray[i] + " ");
 				}
 				
-				this.getOutput().append(Color.BLACK, Color.WHITE,
-					"[" + Support.getDateTimeStamp() + "]: ", Color.BLUE,
-					Color.WHITE, "Input\t\t", Color.BLACK, Color.WHITE,
-					inputString + "\n");
-				this.getOutput().append(Color.BLACK, Color.WHITE,
-					"[" + Support.getDateTimeStamp() + "]: ", Color.RED,
-					Color.WHITE, "Results\t", Color.BLACK, Color.WHITE,
-					outputStringBuilder.toString() + "\n");
-				this.getOutput().append(Color.BLACK, Color.WHITE,
-					"[" + Support.getDateTimeStamp() + "]: ",
-					Color.MAGENTA, Color.WHITE, "Sum\t\t", Color.BLACK,
-					Color.WHITE, resultsArray[upperBound] + "\n\n");
+				this.getOutput().append(Color.BLACK, Color.WHITE, "[" + Support.getDateTimeStamp() + "]: ",
+										Color.BLUE, Color.WHITE, "Input\t\t",
+										Color.BLACK, Color.WHITE, inputString + "\n");
+				
+				this.getOutput().append(Color.BLACK, Color.WHITE, "[" + Support.getDateTimeStamp() + "]: ",
+										Color.RED, Color.WHITE, "Results\t",
+										Color.BLACK, Color.WHITE, outputStringBuilder.toString() + "\n");
+				
+				this.getOutput().append(Color.BLACK, Color.WHITE, "[" + Support.getDateTimeStamp() + "]: ",
+										Color.MAGENTA, Color.WHITE, "Sum\t\t",
+										Color.BLACK, Color.WHITE, resultsArray[upperBound] + "\n\n");
 				
 				isInputBad = false;
 				retVal = resultsArray[upperBound];
