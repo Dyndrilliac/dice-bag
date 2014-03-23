@@ -20,6 +20,7 @@ import java.awt.event.ActionEvent;
 import java.util.Collections;
 import java.util.LinkedList;
 
+import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -29,6 +30,8 @@ public class CombatTracker
 {
 	public static class Creature implements Comparable<Creature>
 	{
+		private static final String FORMAT = "{Name: [%-25s] Health: [%03d/%03d] Initiative: [%02d] Position: [%-4s]}";
+		
 		private int		curHealth	= 0;
 		private DiceBag	diceRoller	= null;
 		private int		initBase	= 0;
@@ -311,12 +314,7 @@ public class CombatTracker
 		@Override
 		public String toString()
 		{
-			String s;
-			
-			s = "{Name: " + "[" + this.getName() + "]" + " Health: " + "[" + this.getCurHealth() + "/" + this.getMaxHealth() + "]" + " Initiative: " +
-				"[" + this.getTotalInit() + "]" + " Position: " + "[" + this.getPosition() + "]}";
-			
-			return s;
+			return String.format(Creature.FORMAT, this.getName(), this.getCurHealth(), this.getMaxHealth(), this.getTotalInit(), this.getPosition());
 		}
 	}
 	
@@ -356,12 +354,18 @@ public class CombatTracker
 					throw new IllegalArgumentException("myActionPerformed Error : argument[0] is of incorrect type.");
 				}
 				
-				ActionEvent event = (ActionEvent)arguments[0];
-				Creature creature = null;
+				ActionEvent	event	= (ActionEvent)arguments[0];
+				Creature	target	= null;
+				Creature	current	= null;
 				
 				if (((CombatTracker)this.parent).getCboCreatureList() != null)
 				{
-					creature = (Creature)((CombatTracker)this.parent).getCboCreatureList().getSelectedItem();
+					target = (Creature)((CombatTracker)this.parent).getCboCreatureList().getSelectedItem();
+				}
+				
+				if (((CombatTracker)this.parent).getCurrentCreature() != null)
+				{
+					current = ((CombatTracker)this.parent).getCurrentCreature();
 				}
 				
 				/*
@@ -373,66 +377,84 @@ public class CombatTracker
 				{
 					case "Damage":
 						
-						if (creature != null)
+						if (target != null)
 						{
 							String amount;
 							
 							do
 							{
-								amount = ((CombatTracker)this.parent).getInputString("How much?\nEnter zero to cancel.", "Damage " + creature.getName());
+								amount = ((CombatTracker)this.parent).getInputString("How much?\nEnter zero to cancel.", "Damage " + target.getName());
 							}
 							while (Support.isStringParsedAsInteger(amount) != true);
 							
-							creature.setCurHealth(creature.getCurHealth() - Integer.parseInt(amount));
-							
-							if (creature.getCurHealth() < 1)
+							if (Integer.parseInt(amount) != 0)
 							{
-								((CombatTracker)this.parent).getCreatureList().remove(creature);
+								target.setCurHealth(target.getCurHealth() - Integer.parseInt(amount));
+								((CombatTracker)this.parent).getParent().getOutput().append(
+									Color.BLACK, Color.WHITE, "[" + Support.getDateTimeStamp() + "]: ",
+									Color.RED, Color.WHITE, "Damaging " + target.getName() + " for " + amount + " HP.\n\n");
+								
+								if (target.getCurHealth() < 1)
+								{
+									((CombatTracker)this.parent).getCreatureList().remove(target);
+									((CombatTracker)this.parent).getParent().getOutput().append(
+										Color.BLACK, Color.WHITE, "[" + Support.getDateTimeStamp() + "]: ",
+										Color.RED, Color.WHITE, target.getName() + " has been reduced to zero or less HP (KO'd).\n\n");
+								}
+								
+								((CombatTracker)this.parent).getWindow().reDrawGUI();
 							}
-							
-							((CombatTracker)this.parent).getWindow().reDrawGUI();
 						}
 						break;
 						
 					case "Heal":
 						
-						if (creature != null)
+						if (target != null)
 						{
 							String amount;
 							
 							do
 							{
-								amount = ((CombatTracker)this.parent).getInputString("How much?\nEnter zero to cancel.", "Heal " + creature.getName());
+								amount = ((CombatTracker)this.parent).getInputString("How much?\nEnter zero to cancel.", "Heal " + target.getName());
 							}
 							while (Support.isStringParsedAsInteger(amount) != true);
 							
-							creature.setCurHealth(creature.getCurHealth() + Integer.parseInt(amount));
-							
-							if (creature.getCurHealth() > creature.getMaxHealth())
+							if (Integer.parseInt(amount) != 0)
 							{
-								creature.setCurHealth(creature.getMaxHealth());
+								target.setCurHealth(target.getCurHealth() + Integer.parseInt(amount));
+								((CombatTracker)this.parent).getParent().getOutput().append(
+									Color.BLACK, Color.WHITE, "[" + Support.getDateTimeStamp() + "]: ",
+									Color.GREEN, Color.WHITE, "Healing " + target.getName() + " for " + amount + " HP.\n\n");
+								
+								if (target.getCurHealth() > target.getMaxHealth())
+								{
+									target.setCurHealth(target.getMaxHealth());
+								}
+								
+								((CombatTracker)this.parent).getWindow().reDrawGUI();
 							}
-							
-							((CombatTracker)this.parent).getWindow().reDrawGUI();
 						}
 						break;
 						
 					case "Move":
 						
-						if (creature != null)
+						if (target != null)
 						{
-							String position;
+							String prevPosition = target.getPosition();
+							String nextPosition;
 							
 							do
 							{
-								position = ((CombatTracker)this.parent).getInputString("Where to? Prompt expects X:YY coordinates." +
-																					   "\nEnter " + creature.getPosition() + " to cancel.",
-																					   "Move " + creature.getName());
+								nextPosition = ((CombatTracker)this.parent).getInputString("Where to? Prompt expects X:YY coordinates." +
+																						   "\nEnter " + prevPosition + " to cancel.",
+																						   "Move " + target.getName());
 							}
-							while (!position.matches("[1-9]:[0-9][0-9]"));
+							while (!nextPosition.matches("[1-9]:[0-9][0-9]"));
 							
-							creature.setPosition(position);
-							
+							target.setPosition(nextPosition);
+							((CombatTracker)this.parent).getParent().getOutput().append(
+								Color.BLACK, Color.WHITE, "[" + Support.getDateTimeStamp() + "]: ",
+								Color.BLUE, Color.WHITE, "Moving " + target.getName() + " from " + prevPosition + " to " + nextPosition + ".\n\n");
 							((CombatTracker)this.parent).getWindow().reDrawGUI();
 						}
 						break;
@@ -440,10 +462,18 @@ public class CombatTracker
 					case "Next":
 						
 						((CombatTracker)this.parent).nextCombatant();
+						current = ((CombatTracker)this.parent).getCurrentCreature();
+						((CombatTracker)this.parent).getParent().getOutput().append(
+							Color.BLACK, Color.WHITE, "[" + Support.getDateTimeStamp() + "]: ",
+							Color.BLACK, Color.WHITE, "Next Combatant:\n",
+							Color.GRAY, Color.WHITE, "\t\t\t   " + current.toString() + "\n\n");
 						break;
 						
 					case "Reset":
 						
+						((CombatTracker)this.parent).getParent().getOutput().append(
+							Color.BLACK, Color.WHITE, "[" + Support.getDateTimeStamp() + "]: ",
+							Color.BLACK, Color.WHITE, "Resetting Combat Parameters...\n\n");
 						((CombatTracker)this.parent).reset();
 						((CombatTracker)this.parent).getWindow().reDrawGUI();
 						break;
@@ -471,17 +501,17 @@ public class CombatTracker
 					throw new IllegalArgumentException("myDrawGUI Error : argument[0] is of incorrect type.");
 				}
 				
-				ApplicationWindow window = (ApplicationWindow)arguments[0];
-				JButton btnDamage = new JButton("Damage");
-				JButton btnHeal = new JButton("Heal");
-				JButton btnMove = new JButton("Move");
-				JButton btnNext = new JButton("Next");
-				JButton btnReset = new JButton("Reset");
-				JPanel buttonPanel = new JPanel();
-				JPanel cboPanel = new JPanel();
-				CombatTracker combatTracker = (CombatTracker)this.parent;
-				Container contentPane = window.getContentPane();
-				JPanel curPanel = new JPanel();
+				ApplicationWindow	window			= (ApplicationWindow)arguments[0];
+				JButton				btnDamage		= new JButton("Damage");
+				JButton				btnHeal			= new JButton("Heal");
+				JButton				btnMove			= new JButton("Move");
+				JButton				btnNext			= new JButton("Next");
+				JButton				btnReset		= new JButton("Reset");
+				JPanel				buttonPanel		= new JPanel();
+				JPanel				cboPanel		= new JPanel();
+				CombatTracker		combatTracker	= (CombatTracker)this.parent;
+				Container			contentPane		= window.getContentPane();
+				JPanel				curPanel		= new JPanel();
 				
 				btnDamage.setFont(CombatTracker.textFont);
 				btnDamage.addActionListener(window);
@@ -497,6 +527,9 @@ public class CombatTracker
 				buttonPanel.add(btnDamage);
 				buttonPanel.add(btnHeal);
 				buttonPanel.add(btnMove);
+				buttonPanel.add(Box.createHorizontalStrut(15));
+				buttonPanel.add(btnNext);
+				buttonPanel.add(btnReset);
 				combatTracker.setCboCreatureList(new JComboBox<Creature>());
 				combatTracker.getCboCreatureList().setFont(CombatTracker.textFont);
 				combatTracker.getCboCreatureList().setEditable(false);
@@ -506,8 +539,6 @@ public class CombatTracker
 				cboPanel.add(combatTracker.getCboCreatureList());
 				curPanel.setLayout(new FlowLayout());
 				curPanel.add(combatTracker.getLblCurrentCreature());
-				curPanel.add(btnNext);
-				curPanel.add(btnReset);
 				contentPane.setLayout(new BorderLayout());
 				contentPane.add(curPanel, BorderLayout.NORTH);
 				contentPane.add(cboPanel, BorderLayout.CENTER);
@@ -739,6 +770,22 @@ public class CombatTracker
 		Collections.sort(this.getCreatureList());
 		this.setCurrentCreature(this.getCreatureList().getFirst());
 		this.setCurCreatureIndex(this.getCreatureList().indexOf(this.getCurrentCreature()));
+		
+		this.getParent().getOutput().append(
+			Color.BLACK, Color.WHITE, "[" + Support.getDateTimeStamp() + "]: ",
+			Color.BLACK, Color.WHITE, "Initial Combatants:\n");
+		
+		for (int i = 0; i < this.getCreatureList().size(); i++)
+		{
+			this.getParent().getOutput().append(Color.GRAY, Color.WHITE, "\t\t\t   " + this.getCreatureList().get(i).toString() + "\n");
+		}
+		
+		this.getParent().getOutput().append(Color.BLACK, Color.WHITE, "\n");
+		
+		this.getParent().getOutput().append(
+			Color.BLACK, Color.WHITE, "[" + Support.getDateTimeStamp() + "]: ",
+			Color.BLACK, Color.WHITE, "First Combatant:\n",
+			Color.GRAY, Color.WHITE, "\t\t\t   " + this.getCurrentCreature().toString() + "\n\n");
 	}
 	
 	public final void setCboCreatureList(final JComboBox<Creature> cboCreatureList)
