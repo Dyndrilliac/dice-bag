@@ -30,7 +30,7 @@ public class CombatTracker
 {
 	public static class Creature implements Comparable<Creature>
 	{
-		private static final String FORMAT = "{Name: [%-25s] Health: [%03d/%03d] Initiative: [%02d] Position: [%-4s]}";
+		public static final String STRING_FORMAT = "{Name: [%-25s] HP: [%03d/%03d] Init: [%02d] Pos: [%-4s]}";
 		
 		private int		curHealth	= 0;
 		private DiceBag	diceRoller	= null;
@@ -244,19 +244,19 @@ public class CombatTracker
 		@Override
 		public int hashCode()
 		{
-			final int prime = 257; // Always prime. Fermat/Pythagorean prime, of the forms (2^(2^3) + 1) and (4n + 1).
+			final int PRIME = 257; // Always prime. Fermat/Pythagorean prime, of the forms (2^(2^3) + 1) and (4n + 1).
 			int result = 89;       // Initially prime.
 			
 			// Use multiplication and XOR to create a high entropy, low collision hash for each object.
-			result = (prime * result) ^ this.curHealth;
-			result = (prime * result) ^ ((this.diceRoller == null) ? 0 : this.diceRoller.hashCode());
-			result = (prime * result) ^ this.initBase;
-			result = (prime * result) ^ this.initBonus;
-			result = (prime * result) ^ this.maxHealth;
-			result = (prime * result) ^ ((this.name == null) ? 0 : this.name.hashCode());
-			result = (prime * result) ^ ((this.position == null) ? 0 : this.position.hashCode());
-			result = (prime * result) ^ this.tieBreaker;
-			result = (prime * result) ^ this.totalInit;
+			result = (PRIME * result) ^ this.curHealth;
+			result = (PRIME * result) ^ ((this.diceRoller == null) ? 0 : this.diceRoller.hashCode());
+			result = (PRIME * result) ^ this.initBase;
+			result = (PRIME * result) ^ this.initBonus;
+			result = (PRIME * result) ^ this.maxHealth;
+			result = (PRIME * result) ^ ((this.name == null) ? 0 : this.name.hashCode());
+			result = (PRIME * result) ^ ((this.position == null) ? 0 : this.position.hashCode());
+			result = (PRIME * result) ^ this.tieBreaker;
+			result = (PRIME * result) ^ this.totalInit;
 			
 			return result;
 		}
@@ -314,12 +314,12 @@ public class CombatTracker
 		@Override
 		public String toString()
 		{
-			return String.format(Creature.FORMAT, this.getName(), this.getCurHealth(), this.getMaxHealth(), this.getTotalInit(), this.getPosition());
+			return String.format(Creature.STRING_FORMAT, this.getName(), this.getCurHealth(), this.getMaxHealth(), this.getTotalInit(), this.getPosition());
 		}
 	}
 	
-	public final static Font		textFont			= new Font("Lucida Console", Font.PLAIN, 14);
-	public final static String		windowTitle			= "Combat Tracker" + " - " + "Round: ";
+	public final static Font		TEXT_FONT			= new Font("Lucida Console", Font.PLAIN, 14);
+	public final static String		WINDOW_TITLE			= "Combat Tracker" + " - " + "Round: ";
 	
 	private JComboBox<Creature>		cboCreatureList		= null;
 	private LinkedList<Creature>	creatureList		= null;
@@ -513,15 +513,15 @@ public class CombatTracker
 				Container			contentPane		= window.getContentPane();
 				JPanel				curPanel		= new JPanel();
 				
-				btnDamage.setFont(CombatTracker.textFont);
+				btnDamage.setFont(CombatTracker.TEXT_FONT);
 				btnDamage.addActionListener(window);
-				btnHeal.setFont(CombatTracker.textFont);
+				btnHeal.setFont(CombatTracker.TEXT_FONT);
 				btnHeal.addActionListener(window);
-				btnMove.setFont(CombatTracker.textFont);
+				btnMove.setFont(CombatTracker.TEXT_FONT);
 				btnMove.addActionListener(window);
-				btnNext.setFont(CombatTracker.textFont);
+				btnNext.setFont(CombatTracker.TEXT_FONT);
 				btnNext.addActionListener(window);
-				btnReset.setFont(CombatTracker.textFont);
+				btnReset.setFont(CombatTracker.TEXT_FONT);
 				btnReset.addActionListener(window);
 				buttonPanel.setLayout(new FlowLayout());
 				buttonPanel.add(btnDamage);
@@ -531,10 +531,10 @@ public class CombatTracker
 				buttonPanel.add(btnNext);
 				buttonPanel.add(btnReset);
 				combatTracker.setCboCreatureList(new JComboBox<Creature>());
-				combatTracker.getCboCreatureList().setFont(CombatTracker.textFont);
+				combatTracker.getCboCreatureList().setFont(CombatTracker.TEXT_FONT);
 				combatTracker.getCboCreatureList().setEditable(false);
 				combatTracker.setLblCurrentCreature(new JLabel("Current: " + combatTracker.getCurrentCreature().toString()));
-				combatTracker.getLblCurrentCreature().setFont(CombatTracker.textFont);
+				combatTracker.getLblCurrentCreature().setFont(CombatTracker.TEXT_FONT);
 				cboPanel.setLayout(new FlowLayout());
 				cboPanel.add(combatTracker.getCboCreatureList());
 				curPanel.setLayout(new FlowLayout());
@@ -550,12 +550,12 @@ public class CombatTracker
 				}
 				
 				combatTracker.getCboCreatureList().setSelectedIndex(combatTracker.getCreatureList().indexOf(combatTracker.getCurrentCreature()));
-				window.setTitle(CombatTracker.windowTitle + combatTracker.getNumRounds());
+				window.setTitle(CombatTracker.WINDOW_TITLE + combatTracker.getNumRounds());
 			}
 		};
 		
-		this.setWindow(new ApplicationWindow(this.getParent().getWindow(), CombatTracker.windowTitle + this.getNumRounds(),
-			new Dimension(1000, 120), this.isDebugging(), false, myActionPerformed, myDrawGUI));
+		this.setWindow(new ApplicationWindow(this.getParent().getWindow(), CombatTracker.WINDOW_TITLE + this.getNumRounds(),
+			new Dimension(800, 114), this.isDebugging(), false, myActionPerformed, myDrawGUI));
 		this.getWindow().setIconImageByResourceName("icon.png");
 	}
 	
@@ -630,6 +630,7 @@ public class CombatTracker
 		return this.isDebugging;
 	}
 	
+	// TODO: CombatTracker Initiative Order Bug When Killing Creature With Higher Initiative #2
 	public void nextCombatant()
 	{
 		int index;
@@ -647,6 +648,10 @@ public class CombatTracker
 		{
 			this.setNumRounds(this.getNumRounds() + 1);
 			index = 0;
+			
+			this.getParent().getOutput().append(
+				Color.BLACK, Color.WHITE, "[" + Support.getDateTimeStamp() + "]: ",
+				Color.MAGENTA, Color.WHITE, "- Round " + this.getNumRounds() + " -\n\n");
 		}
 		
 		this.setCurCreatureIndex(index);
@@ -781,6 +786,10 @@ public class CombatTracker
 		}
 		
 		this.getParent().getOutput().append(Color.BLACK, Color.WHITE, "\n");
+		
+		this.getParent().getOutput().append(
+			Color.BLACK, Color.WHITE, "[" + Support.getDateTimeStamp() + "]: ",
+			Color.MAGENTA, Color.WHITE, "- Round 1 -\n\n");
 		
 		this.getParent().getOutput().append(
 			Color.BLACK, Color.WHITE, "[" + Support.getDateTimeStamp() + "]: ",

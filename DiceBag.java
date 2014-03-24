@@ -35,8 +35,8 @@ import javax.swing.KeyStroke;
 
 public class DiceBag
 {
-	private final static Font	textFont				= new Font("Lucida Console", Font.PLAIN, 14);
-	private final static String	inputExceptionString	= "Incorrect input format! Provide two non-negative integers separated by the character 'd'." +
+	public final static Font	TEXT_FONT				= new Font("Lucida Console", Font.PLAIN, 14);
+	public final static String	INPUT_EXCEPTION_STRING	= "Incorrect input format! Provide two non-negative integers separated by the character 'd'." +
 														  "\nThe 'd' is not case sensitve." +
 														  "\nExamples: 3d6, 2d8, 1d20, 15D6, 10D10, 4D4, etc.";
 	
@@ -156,17 +156,17 @@ public class DiceBag
 				JMenuItem clearOption = new JMenuItem("Clear");
 				JMenuItem openOption = new JMenuItem("Open");
 				JMenuItem saveOption = new JMenuItem("Save");
-				RichTextPane outputBox = new RichTextPane(window, true, window.isDebugging(), DiceBag.textFont);
+				RichTextPane outputBox = new RichTextPane(window, true, window.isDebugging(), DiceBag.TEXT_FONT);
 				JComboBox<String> inputBox = new JComboBox<String>();
 				JButton inputBtn = new JButton("Throw");
 				
-				menuBar.setFont(DiceBag.textFont);
-				toolsMenu.setFont(DiceBag.textFont);
-				ctOption.setFont(DiceBag.textFont);
-				fileMenu.setFont(DiceBag.textFont);
-				clearOption.setFont(DiceBag.textFont);
-				openOption.setFont(DiceBag.textFont);
-				saveOption.setFont(DiceBag.textFont);
+				menuBar.setFont(DiceBag.TEXT_FONT);
+				toolsMenu.setFont(DiceBag.TEXT_FONT);
+				ctOption.setFont(DiceBag.TEXT_FONT);
+				fileMenu.setFont(DiceBag.TEXT_FONT);
+				clearOption.setFont(DiceBag.TEXT_FONT);
+				openOption.setFont(DiceBag.TEXT_FONT);
+				saveOption.setFont(DiceBag.TEXT_FONT);
 				contentPane.setLayout(new BorderLayout());
 				clearOption.addActionListener(window);
 				fileMenu.add(clearOption);
@@ -196,9 +196,9 @@ public class DiceBag
 				
 				outputBox.setBackground(Color.WHITE);
 				inputBox.setEditable(true);
-				inputBox.setFont(DiceBag.textFont);
+				inputBox.setFont(DiceBag.TEXT_FONT);
 				inputBox.setModel(new UniqueComboBoxModel());
-				inputBtn.setFont(DiceBag.textFont);
+				inputBtn.setFont(DiceBag.TEXT_FONT);
 				inputBtn.addActionListener(window);
 				inputPanel.setLayout(new FlowLayout());
 				inputPanel.add(inputBox);
@@ -299,7 +299,7 @@ public class DiceBag
 		
 		if (isInputBad)
 		{
-			Support.displayException(this.getWindow(), new IllegalArgumentException(DiceBag.inputExceptionString), false);
+			Support.displayException(this.getWindow(), new IllegalArgumentException(DiceBag.INPUT_EXCEPTION_STRING), false);
 		}
 		
 		this.getInput().setSelectedIndex(-1);
