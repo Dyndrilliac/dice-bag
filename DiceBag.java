@@ -1,7 +1,7 @@
 /*
-	Title: DiceBag
+	Title:  DiceBag
 	Author: Matthew Boyette
-	Date: 3/31/2012
+	Date:   3/31/2012
 	
 	This application simulates dice rolls for table top games like Dungeons & Dragons. It accepts input in the form of a string.
 	The string should be formatted such that it contains two positive integers separated by the character 'd'. The 'd' is not case
@@ -82,8 +82,13 @@ public class DiceBag
 				{
 					throw new IllegalArgumentException("myActionPerformed Error : argument[0] is of incorrect type.");
 				}
+				else if (!(arguments[1] instanceof ApplicationWindow))
+				{
+					throw new IllegalArgumentException("myActionPerformed Error : argument[1] is of incorrect type.");
+				}
 				
-				ActionEvent event = (ActionEvent)arguments[0];
+				ActionEvent			event	= (ActionEvent)arguments[0];
+				//ApplicationWindow	window	= (ApplicationWindow)arguments[1];
 				
 				if ((((DiceBag)this.parent).getOutput() != null) && (((DiceBag)this.parent).getInput() != null))
 				{

@@ -1,7 +1,7 @@
 /*
-	Title: CombatTracker (DiceBag Add-on)
+	Title:  CombatTracker (DiceBag Add-on)
 	Author: Matthew Boyette
-	Date: 2/19/2014
+	Date:   2/19/2014
 	
 	This class is an add-on which allows a DM to track combat information like health, initiative, and the current round.
 	It also interfaces with the DiceBag class so that initiative die rolls are recorded in the log automatically.
@@ -353,19 +353,27 @@ public class CombatTracker
 				{
 					throw new IllegalArgumentException("myActionPerformed Error : argument[0] is of incorrect type.");
 				}
-				
-				ActionEvent	event	= (ActionEvent)arguments[0];
-				Creature	target	= null;
-				Creature	current	= null;
-				
-				if (((CombatTracker)this.parent).getCboCreatureList() != null)
+				else if (!(arguments[1] instanceof ApplicationWindow))
 				{
-					target = (Creature)((CombatTracker)this.parent).getCboCreatureList().getSelectedItem();
+					throw new IllegalArgumentException("myActionPerformed Error : argument[1] is of incorrect type.");
 				}
 				
-				if (((CombatTracker)this.parent).getCurrentCreature() != null)
+				ActionEvent			event	= (ActionEvent)arguments[0];
+				ApplicationWindow	window	= (ApplicationWindow)arguments[1];
+				Creature			current	= null;
+				Creature			target	= null;
+				CombatTracker		parent	= ((CombatTracker)this.parent);
+				RichTextPane		output  = parent.getParent().getOutput();
+				
+				
+				if (parent.getCboCreatureList() != null)
 				{
-					current = ((CombatTracker)this.parent).getCurrentCreature();
+					target = (Creature)parent.getCboCreatureList().getSelectedItem();
+				}
+				
+				if (parent.getCurrentCreature() != null)
+				{
+					current = parent.getCurrentCreature();
 				}
 				
 				/*
@@ -379,30 +387,22 @@ public class CombatTracker
 						
 						if (target != null)
 						{
-							String amount;
+							int amount = parent.getIntegerInputString("How much?\nEnter zero to cancel.", "Damage " + target.getName());
 							
-							do
+							if (amount != 0)
 							{
-								amount = ((CombatTracker)this.parent).getInputString("How much?\nEnter zero to cancel.", "Damage " + target.getName());
-							}
-							while (Support.isStringParsedAsInteger(amount) != true);
-							
-							if (Integer.parseInt(amount) != 0)
-							{
-								target.setCurHealth(target.getCurHealth() - Integer.parseInt(amount));
-								((CombatTracker)this.parent).getParent().getOutput().append(
-									Color.BLACK, Color.WHITE, "[" + Support.getDateTimeStamp() + "]: ",
-									Color.RED, Color.WHITE, "Damaging " + target.getName() + " for " + amount + " HP.\n\n");
+								target.setCurHealth(target.getCurHealth() - amount);
+								output.append(Color.BLACK, Color.WHITE, "[" + Support.getDateTimeStamp() + "]: ",
+											  Color.RED, Color.WHITE, "Damaging " + target.getName() + " for " + amount + " HP.\n\n");
 								
 								if (target.getCurHealth() < 1)
 								{
-									((CombatTracker)this.parent).getCreatureList().remove(target);
-									((CombatTracker)this.parent).getParent().getOutput().append(
-										Color.BLACK, Color.WHITE, "[" + Support.getDateTimeStamp() + "]: ",
-										Color.RED, Color.WHITE, target.getName() + " has been reduced to zero or less HP (KO'd).\n\n");
+									parent.getCreatureList().remove(target);
+									output.append(Color.BLACK, Color.WHITE, "[" + Support.getDateTimeStamp() + "]: ",
+												  Color.RED, Color.WHITE, target.getName() + " has been reduced to zero or less HP (KO'd).\n\n");
 								}
 								
-								((CombatTracker)this.parent).getWindow().reDrawGUI();
+								parent.getWindow().reDrawGUI();
 							}
 						}
 						break;
@@ -411,27 +411,20 @@ public class CombatTracker
 						
 						if (target != null)
 						{
-							String amount;
+							int amount = parent.getIntegerInputString("How much?\nEnter zero to cancel.", "Heal " + target.getName());
 							
-							do
+							if (amount != 0)
 							{
-								amount = ((CombatTracker)this.parent).getInputString("How much?\nEnter zero to cancel.", "Heal " + target.getName());
-							}
-							while (Support.isStringParsedAsInteger(amount) != true);
-							
-							if (Integer.parseInt(amount) != 0)
-							{
-								target.setCurHealth(target.getCurHealth() + Integer.parseInt(amount));
-								((CombatTracker)this.parent).getParent().getOutput().append(
-									Color.BLACK, Color.WHITE, "[" + Support.getDateTimeStamp() + "]: ",
-									Color.GREEN, Color.WHITE, "Healing " + target.getName() + " for " + amount + " HP.\n\n");
+								target.setCurHealth(target.getCurHealth() + amount);
+								output.append(Color.BLACK, Color.WHITE, "[" + Support.getDateTimeStamp() + "]: ",
+											  Color.GREEN, Color.WHITE, "Healing " + target.getName() + " for " + amount + " HP.\n\n");
 								
 								if (target.getCurHealth() > target.getMaxHealth())
 								{
 									target.setCurHealth(target.getMaxHealth());
 								}
 								
-								((CombatTracker)this.parent).getWindow().reDrawGUI();
+								window.reDrawGUI();
 							}
 						}
 						break;
@@ -441,41 +434,34 @@ public class CombatTracker
 						if (target != null)
 						{
 							String prevPosition = target.getPosition();
-							String nextPosition;
-							
-							do
+							String nextPosition = parent.getCoordinateInputString("Where to? Prompt expects X:YY coordinates." +
+																				  "\nEnter " + prevPosition + " to cancel.",
+																				  "Move " + target.getName());
+							if (!nextPosition.equals(prevPosition))
 							{
-								nextPosition = ((CombatTracker)this.parent).getInputString("Where to? Prompt expects X:YY coordinates." +
-																						   "\nEnter " + prevPosition + " to cancel.",
-																						   "Move " + target.getName());
+								target.setPosition(nextPosition);
+								output.append(Color.BLACK, Color.WHITE, "[" + Support.getDateTimeStamp() + "]: ",
+											  Color.BLUE, Color.WHITE, "Moving " + target.getName() + " from " + prevPosition + " to " + nextPosition + ".\n\n");
+								window.reDrawGUI();
 							}
-							while (!nextPosition.matches("[1-9]:[0-9][0-9]"));
-							
-							target.setPosition(nextPosition);
-							((CombatTracker)this.parent).getParent().getOutput().append(
-								Color.BLACK, Color.WHITE, "[" + Support.getDateTimeStamp() + "]: ",
-								Color.BLUE, Color.WHITE, "Moving " + target.getName() + " from " + prevPosition + " to " + nextPosition + ".\n\n");
-							((CombatTracker)this.parent).getWindow().reDrawGUI();
 						}
 						break;
 						
 					case "Next":
 						
-						((CombatTracker)this.parent).nextCombatant();
-						current = ((CombatTracker)this.parent).getCurrentCreature();
-						((CombatTracker)this.parent).getParent().getOutput().append(
-							Color.BLACK, Color.WHITE, "[" + Support.getDateTimeStamp() + "]: ",
-							Color.BLACK, Color.WHITE, "Next Combatant:\n",
-							Color.GRAY, Color.WHITE, "\t\t\t   " + current.toString() + "\n\n");
+						parent.nextCombatant();
+						current = parent.getCurrentCreature();
+						output.append(Color.BLACK, Color.WHITE, "[" + Support.getDateTimeStamp() + "]: ",
+									  Color.BLACK, Color.WHITE, "Next Combatant:\n",
+									  Color.GRAY, Color.WHITE, "\t\t\t   " + current.toString() + "\n\n");
 						break;
 						
 					case "Reset":
 						
-						((CombatTracker)this.parent).getParent().getOutput().append(
-							Color.BLACK, Color.WHITE, "[" + Support.getDateTimeStamp() + "]: ",
-							Color.BLACK, Color.WHITE, "Resetting Combat Parameters...\n\n");
-						((CombatTracker)this.parent).reset();
-						((CombatTracker)this.parent).getWindow().reDrawGUI();
+						output.append(Color.BLACK, Color.WHITE, "[" + Support.getDateTimeStamp() + "]: ",
+									  Color.BLACK, Color.WHITE, "Resetting Combat Parameters...\n\n");
+						parent.reset();
+						window.reDrawGUI();
 						break;
 						
 					default:
@@ -584,6 +570,19 @@ public class CombatTracker
 		return this.curCreatureIndex;
 	}
 	
+	public final String getCoordinateInputString(final String message, final String title)
+	{
+		String s;
+		
+		do
+		{
+			s = this.getInputString(message, title);
+		}
+		while (!s.matches("[1-9]:[0-9][0-9]"));
+		
+		return s;
+	}
+	
 	public final String getInputString(final String message, final String title)
 	{
 		ApplicationWindow windowHandle = null;
@@ -598,6 +597,22 @@ public class CombatTracker
 		}
 		
 		return Support.getInputString(windowHandle, message, title);
+	}
+	
+	public final int getIntegerInputString(final String message, final String title)
+	{
+		ApplicationWindow windowHandle = null;
+		
+		if (this.getWindow() != null)
+		{
+			windowHandle = this.getWindow();
+		}
+		else
+		{
+			windowHandle = this.getParent().getWindow();
+		}
+		
+		return Support.getIntegerInputString(windowHandle, message, title);
 	}
 	
 	public final JLabel getLblCurrentCreature()
@@ -649,9 +664,8 @@ public class CombatTracker
 			this.setNumRounds(this.getNumRounds() + 1);
 			index = 0;
 			
-			this.getParent().getOutput().append(
-				Color.BLACK, Color.WHITE, "[" + Support.getDateTimeStamp() + "]: ",
-				Color.MAGENTA, Color.WHITE, "- Round " + this.getNumRounds() + " -\n\n");
+			this.getParent().getOutput().append(Color.BLACK, Color.WHITE, "[" + Support.getDateTimeStamp() + "]: ",
+												Color.MAGENTA, Color.WHITE, "- Round " + this.getNumRounds() + " -\n\n");
 		}
 		
 		this.setCurCreatureIndex(index);
@@ -663,111 +677,43 @@ public class CombatTracker
 	{
 		this.setNumRounds(1);
 		this.setCreatureList(new LinkedList<Creature>());
-		
-		String s = null;
-		
-		do
-		{
-			s = this.getInputString("How many players are there?", "Combat Setup");
-		}
-		while (Support.isStringParsedAsInteger(s) != true);
-		
-		this.setNumPlayers(Integer.parseInt(s));
-		
-		do
-		{
-			s = this.getInputString("How many enemy types are there?", "Combat Setup");
-		}
-		while (Support.isStringParsedAsInteger(s) != true);
-		
-		this.setNumEnemyTypes(Integer.parseInt(s));
+		this.setNumPlayers(this.getIntegerInputString("How many players?", "Combat Setup"));
+		this.setNumEnemyTypes(this.getIntegerInputString("How many enemy types?", "Combat Setup"));
 		
 		for (int i = 1; i <= this.getNumPlayers(); i++)
 		{
-			String name = this.getInputString("What is player " + i + "'s character name?", "Combat Setup");
-			
-			do
-			{
-				s = this.getInputString("What is player " + i + "'s current health?", "Combat Setup");
-			}
-			while (Support.isStringParsedAsInteger(s) != true);
-			
-			int curHealth = Integer.parseInt(s);
-			
-			do
-			{
-				s = this.getInputString("What is player " + i + "'s maximum health?", "Combat Setup");
-			}
-			while (Support.isStringParsedAsInteger(s) != true);
-			
-			int maxHealth = Integer.parseInt(s);
-			
-			do
-			{
-				s = this.getInputString("What is player " + i + "'s initiative modifier?", "Combat Setup");
-			}
-			while (Support.isStringParsedAsInteger(s) != true);
-			
-			int initBonus = Integer.parseInt(s);
+			String	name		= this.getInputString("What is player " + i + "'s character name?", "Combat Setup");
+			String	position	= this.getCoordinateInputString("What is player " + i + "'s battle grid position?" +
+																"\nPrompt expects X:YY coordinates.", "Combat Setup");
 			
 			this.parent.getOutput().append(Color.BLACK, Color.WHITE, "\t\t\t   Rolling initiative for " + name + "...\n");
-			int initBase = this.parent.processInput("1d20");
 			
-			String position;
+			int			initBase	= this.parent.processInput("1d20");
+			int			curHealth	= this.getIntegerInputString("What is player " + i + "'s current health?", "Combat Setup");
+			int			maxHealth	= this.getIntegerInputString("What is player " + i + "'s maximum health?", "Combat Setup");
+			int			initBonus	= this.getIntegerInputString("What is player " + i + "'s initiative modifier?", "Combat Setup");
+			Creature	player		= new Creature(this.getParent(), name, curHealth, initBase, initBonus, maxHealth, position);
 			
-			do
-			{
-				position = this.getInputString("What is player " + i + "'s battle grid position?" +
-					   						   "\nPrompt expects X:YY coordinates.", "Combat Setup");
-			}
-			while (!position.matches("[1-9]:[0-9][0-9]"));
-			
-			Creature player = new Creature(this.getParent(), name, curHealth, initBase, initBonus, maxHealth, position);
 			this.getCreatureList().add(player);
 		}
 		
 		for (int i = 1; i <= this.getNumEnemyTypes(); i++)
 		{
-			do
-			{
-				s = this.getInputString("How many enemies are there of type " + i + "?", "Combat Setup");
-			}
-			while (Support.isStringParsedAsInteger(s) != true);
-			
-			int numEnemies = Integer.parseInt(s);
-			
-			String name = this.getInputString("What is enemy type " + i + "'s name?", "Combat Setup");
-			
-			do
-			{
-				s = this.getInputString("What is enemy type " + i + "'s maximum health?", "Combat Setup");
-			}
-			while (Support.isStringParsedAsInteger(s) != true);
-			
-			int maxHealth = Integer.parseInt(s);
-			
-			do
-			{
-				s = this.getInputString("What is enemy type " + i + "'s initiative modifier?", "Combat Setup");
-			}
-			while (Support.isStringParsedAsInteger(s) != true);
-			
-			int initBonus = Integer.parseInt(s);
+			String	name		= this.getInputString("What is enemy type " + i + "'s name?", "Combat Setup");
+			int		numEnemies	= this.getIntegerInputString("How many enemies are there of type " + i + "?", "Combat Setup");
+			int		maxHealth	= this.getIntegerInputString("What is enemy type " + i + "'s maximum health?", "Combat Setup");
+			int		initBonus	= this.getIntegerInputString("What is enemy type " + i + "'s initiative modifier?", "Combat Setup");
 			
 			for (int j = 1; j <= numEnemies; j++)
 			{
-				String position;
-				
-				do
-				{
-					position = this.getInputString("What is " + name + " " + j + "'s battle grid position?" +
-												   "\nPrompt expects X:YY coordinates.", "Combat Setup");
-				}
-				while (!position.matches("[1-9]:[0-9][0-9]"));
+				String position = this.getCoordinateInputString("What is " + name + " " + j + "'s battle grid position?" +
+																"\nPrompt expects X:YY coordinates.", "Combat Setup");
 				
 				this.parent.getOutput().append(Color.BLACK, Color.WHITE, "\t\t\t   Rolling initiative for " + name + " " + j + "...\n");
-				int initBase = this.parent.processInput("1d20");
-				Creature enemy = new Creature(this.getParent(), name + " " + j, initBase, initBonus, maxHealth, position);
+				
+				int			initBase	= this.parent.processInput("1d20");
+				Creature	enemy		= new Creature(this.getParent(), name + " " + j, initBase, initBonus, maxHealth, position);
+				
 				this.getCreatureList().add(enemy);
 			}
 		}
@@ -776,9 +722,8 @@ public class CombatTracker
 		this.setCurrentCreature(this.getCreatureList().getFirst());
 		this.setCurCreatureIndex(this.getCreatureList().indexOf(this.getCurrentCreature()));
 		
-		this.getParent().getOutput().append(
-			Color.BLACK, Color.WHITE, "[" + Support.getDateTimeStamp() + "]: ",
-			Color.BLACK, Color.WHITE, "Initial Combatants:\n");
+		this.getParent().getOutput().append(Color.BLACK, Color.WHITE, "[" + Support.getDateTimeStamp() + "]: ",
+											Color.BLACK, Color.WHITE, "Initial Combatants:\n");
 		
 		for (int i = 0; i < this.getCreatureList().size(); i++)
 		{
@@ -787,14 +732,12 @@ public class CombatTracker
 		
 		this.getParent().getOutput().append(Color.BLACK, Color.WHITE, "\n");
 		
-		this.getParent().getOutput().append(
-			Color.BLACK, Color.WHITE, "[" + Support.getDateTimeStamp() + "]: ",
-			Color.MAGENTA, Color.WHITE, "- Round 1 -\n\n");
+		this.getParent().getOutput().append(Color.BLACK, Color.WHITE, "[" + Support.getDateTimeStamp() + "]: ",
+											Color.MAGENTA, Color.WHITE, "- Round " + this.getNumRounds() + " -\n\n");
 		
-		this.getParent().getOutput().append(
-			Color.BLACK, Color.WHITE, "[" + Support.getDateTimeStamp() + "]: ",
-			Color.BLACK, Color.WHITE, "First Combatant:\n",
-			Color.GRAY, Color.WHITE, "\t\t\t   " + this.getCurrentCreature().toString() + "\n\n");
+		this.getParent().getOutput().append(Color.BLACK, Color.WHITE, "[" + Support.getDateTimeStamp() + "]: ",
+											Color.BLACK, Color.WHITE, "First Combatant:\n",
+											Color.GRAY, Color.WHITE, "\t\t\t   " + this.getCurrentCreature().toString() + "\n\n");
 	}
 	
 	public final void setCboCreatureList(final JComboBox<Creature> cboCreatureList)
