@@ -102,97 +102,6 @@ public class CombatTracker
 			this.setCurHealth(this.getCurHealth() - amount);
 		}
 		
-		/*
-			@see java.lang.Object#equals(java.lang.Object)
-		*/
-		@Override
-		public boolean equals(Object obj)
-		{
-			if (this == obj)
-			{
-				return true;
-			}
-			if (obj == null)
-			{
-				return false;
-			}
-			if (!(obj instanceof Creature))
-			{
-				return false;
-			}
-			
-			Creature other = (Creature)obj;
-			
-			if (this.curHealth != other.curHealth)
-			{
-				return false;
-			}
-			if (this.diceRoller == null)
-			{
-				if (other.diceRoller != null)
-				{
-					return false;
-				}
-			}
-			else
-			{
-				if (!this.diceRoller.equals(other.diceRoller))
-				{
-					return false;
-				}
-			}
-			if (this.initBase != other.initBase)
-			{
-				return false;
-			}
-			if (this.initBonus != other.initBonus)
-			{
-				return false;
-			}
-			if (this.maxHealth != other.maxHealth)
-			{
-				return false;
-			}
-			if (this.name == null)
-			{
-				if (other.name != null)
-				{
-					return false;
-				}
-			}
-			else
-			{
-				if (!this.name.equals(other.name))
-				{
-					return false;
-				}
-			}
-			if (this.position == null)
-			{
-				if (other.position != null)
-				{
-					return false;
-				}
-			}
-			else
-			{
-				if (!this.position.equals(other.position))
-				{
-					return false;
-				}
-			}
-			if (this.tieBreaker != other.tieBreaker)
-			{
-				return false;
-			}
-			if (this.totalInit != other.totalInit)
-			{
-				return false;
-			}
-			
-			return true;
-		}
-
 		public final int getCurHealth()
 		{
 			return this.curHealth;
@@ -236,29 +145,6 @@ public class CombatTracker
 		public final int getTotalInit()
 		{
 			return this.totalInit;
-		}
-		
-		/*
-			@see java.lang.Object#hashCode()
-		*/
-		@Override
-		public int hashCode()
-		{
-			final int PRIME = 257; // Always prime. Fermat/Pythagorean prime, of the forms (2^(2^3) + 1) and (4n + 1).
-			int result = 89;       // Initially prime.
-			
-			// Use multiplication and XOR to create a high entropy, low collision hash for each object.
-			result = (PRIME * result) ^ this.curHealth;
-			result = (PRIME * result) ^ ((this.diceRoller == null) ? 0 : this.diceRoller.hashCode());
-			result = (PRIME * result) ^ this.initBase;
-			result = (PRIME * result) ^ this.initBonus;
-			result = (PRIME * result) ^ this.maxHealth;
-			result = (PRIME * result) ^ ((this.name == null) ? 0 : this.name.hashCode());
-			result = (PRIME * result) ^ ((this.position == null) ? 0 : this.position.hashCode());
-			result = (PRIME * result) ^ this.tieBreaker;
-			result = (PRIME * result) ^ this.totalInit;
-			
-			return result;
 		}
 		
 		public void heal(final int amount)
@@ -325,6 +211,7 @@ public class CombatTracker
 	private LinkedList<Creature>	creatureList		= null;
 	private Creature				curCreature			= null;
 	private int						curCreatureIndex	= 0;
+	private boolean					higherInitKillFlag  = false;
 	private boolean					isDebugging			= false;
 	private JLabel					lblCurrentCreature	= null;
 	private int						numEnemyTypes		= 0;
@@ -398,6 +285,12 @@ public class CombatTracker
 								if (target.getCurHealth() < 1)
 								{
 									parent.getCreatureList().remove(target);
+									
+									if (target.getTotalInit() > current.getTotalInit())
+									{
+										parent.setHigherInitKillFlag(true);
+									}
+									
 									output.append(Color.BLACK, Color.WHITE, "[" + Support.getDateTimeStamp() + "]: ",
 												  Color.RED, Color.WHITE, target.getName() + " has been reduced to zero or less HP (KO'd).\n\n");
 								}
@@ -645,18 +538,25 @@ public class CombatTracker
 		return this.isDebugging;
 	}
 	
-	// TODO: CombatTracker Initiative Order Bug When Killing Creature With Higher Initiative #2
+	public final boolean isHigherInitKillFlag()
+	{
+		return this.higherInitKillFlag;
+	}
+	
 	public void nextCombatant()
 	{
-		int index;
+		boolean	KilledCreatureHigherInit	= false;
+		int		index						= (this.getCurCreatureIndex() + 1);
 		
-		if (this.getCreatureList().indexOf(this.getCurrentCreature()) == -1)
+		if (this.isHigherInitKillFlag())
+		{
+			KilledCreatureHigherInit = true;
+			this.setHigherInitKillFlag(false);
+		}
+		
+		if ((this.getCreatureList().indexOf(this.getCurrentCreature()) == -1) || (KilledCreatureHigherInit))
 		{
 			index = this.getCurCreatureIndex();
-		}
-		else
-		{
-			index = (this.getCurCreatureIndex() + 1);
 		}
 		
 		if (index >= this.getCreatureList().size())
@@ -770,6 +670,11 @@ public class CombatTracker
 		this.isDebugging = isDebugging;
 	}
 	
+	public final void setHigherInitKillFlag(final boolean higherInitKillFlag)
+	{
+		this.higherInitKillFlag = higherInitKillFlag;
+	}
+
 	public final void setLblCurrentCreature(final JLabel lblCurrentCreature)
 	{
 		this.lblCurrentCreature = lblCurrentCreature;
