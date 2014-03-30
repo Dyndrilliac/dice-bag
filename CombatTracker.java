@@ -290,6 +290,14 @@ public class CombatTracker
 									{
 										parent.setHigherInitKillFlag(true);
 									}
+									else if ((target.getTotalInit() == current.getTotalInit()) && (target.getInitBonus() > current.getInitBonus()))
+									{
+										parent.setHigherInitKillFlag(true);
+									}
+									else if ((target.getTotalInit() == current.getTotalInit()) && (target.getInitBonus() == current.getInitBonus()) && (target.getTieBreaker() > current.getTieBreaker()))
+									{
+										parent.setHigherInitKillFlag(true);
+									}
 									
 									output.append(Color.BLACK, Color.WHITE, "[" + Support.getDateTimeStamp() + "]: ",
 												  Color.RED, Color.WHITE, target.getName() + " has been reduced to zero or less HP (KO'd).\n\n");
