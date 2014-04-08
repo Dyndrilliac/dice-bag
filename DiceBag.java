@@ -11,8 +11,11 @@
 	Examples: 3d6, 2d8, 1d20, 15D6, 10D10, 4D4, etc.
 */
 
-import api.gui.*;
-import api.util.*;
+import api.gui.ApplicationWindow;
+import api.gui.RichTextPane;
+import api.util.EventHandler;
+import api.util.Games;
+import api.util.Support;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -21,6 +24,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
+import java.io.Serializable;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
@@ -28,17 +32,31 @@ import javax.swing.JComboBox;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 
-public class DiceBag
+public class DiceBag implements Serializable
 {
+	public final static class UniqueComboBoxModel extends DefaultComboBoxModel<String>
+	{
+		private final static long	serialVersionUID	= 1L;
+		
+		@Override
+		public final void addElement(final String s)
+		{
+			if (this.getIndexOf(s) == -1)
+			{
+				super.addElement(s);
+			}
+		}
+	}
+	
+	private final static long	serialVersionUID		= 1L;
 	public final static Font	TEXT_FONT				= new Font("Lucida Console", Font.PLAIN, 14);
 	public final static String	INPUT_EXCEPTION_STRING	= "Incorrect input format! Provide two non-negative integers separated by the character 'd'." +
-														  "\nThe 'd' is not case sensitve." +
-														  "\nExamples: 3d6, 2d8, 1d20, 15D6, 10D10, 4D4, etc.";
+															"\nThe 'd' is not case sensitve." +
+															"\nExamples: 3d6, 2d8, 1d20, 15D6, 10D10, 4D4, etc.";
 	
 	public final static void main(final String[] args)
 	{
@@ -50,23 +68,9 @@ public class DiceBag
 	private RichTextPane		output		= null;
 	private ApplicationWindow	window		= null;
 	
-	public final static class UniqueComboBoxModel extends DefaultComboBoxModel<String>
-	{
-		private static final long	serialVersionUID	= 1L;
-		
-		public void addElement(String s)
-		{  
-			if (this.getIndexOf(s) == -1)
-			{
-				super.addElement(s);
-			}
-	    }
-	}
-	
 	public DiceBag(final boolean showWindow)
 	{
-		int choice = Support.promptDebugMode(this.getWindow());
-		this.setDebugging((choice == JOptionPane.YES_OPTION));
+		this.setDebugging(Support.promptDebugMode(this.getWindow()));
 		
 		// Define a self-contained ActionListener event handler.
 		EventHandler myActionPerformed = new EventHandler(this)
@@ -89,8 +93,9 @@ public class DiceBag
 				
 				ActionEvent			event	= (ActionEvent)arguments[0];
 				//ApplicationWindow	window	= (ApplicationWindow)arguments[1];
+				DiceBag				parent	= ((DiceBag)this.parent);
 				
-				if ((((DiceBag)this.parent).getOutput() != null) && (((DiceBag)this.parent).getInput() != null))
+				if ((parent.getOutput() != null) && (parent.getInput() != null))
 				{
 					/*
 						JDK 7 allows string objects as the expression in a switch statement.
@@ -101,34 +106,34 @@ public class DiceBag
 					{
 						case "Clear":
 							
-							((DiceBag)this.parent).clearLog();
+							parent.clearLog();
 							break;
-							
+						
 						case "Combat Tracker":
 							
-							new CombatTracker(((DiceBag)this.parent), ((DiceBag)this.parent).isDebugging());
+							new CombatTracker(parent, parent.isDebugging());
 							break;
-							
+						
 						case "Open":
 							
-							((DiceBag)this.parent).openLog();
+							parent.openLog();
 							break;
-							
+						
 						case "Save":
 							
-							((DiceBag)this.parent).saveLog();
+							parent.saveLog();
 							break;
-							
+						
 						case "Throw":
 							
-							Object obj = ((DiceBag)this.parent).getInput().getSelectedItem();
+							Object obj = parent.getInput().getSelectedItem();
 							
 							if ((obj != null) && (((String)obj).isEmpty() == false))
 							{
-								((DiceBag)this.parent).processInput(((String)((DiceBag)this.parent).getInput().getSelectedItem()).toLowerCase());
+								parent.processInput(((String)parent.getInput().getSelectedItem()).toLowerCase());
 							}
 							break;
-							
+						
 						default:
 							
 							break;
@@ -152,18 +157,19 @@ public class DiceBag
 					throw new IllegalArgumentException("myDrawGUI Error : argument[0] is of incorrect type.");
 				}
 				
-				ApplicationWindow window = (ApplicationWindow)arguments[0];
-				Container contentPane = window.getContentPane();
-				JMenuBar menuBar = new JMenuBar();
-				JMenu toolsMenu = new JMenu("Tools");
-				JMenuItem ctOption = new JMenuItem("Combat Tracker");
-				JMenu fileMenu = new JMenu("File");
-				JMenuItem clearOption = new JMenuItem("Clear");
-				JMenuItem openOption = new JMenuItem("Open");
-				JMenuItem saveOption = new JMenuItem("Save");
-				RichTextPane outputBox = new RichTextPane(window, true, window.isDebugging(), DiceBag.TEXT_FONT);
-				JComboBox<String> inputBox = new JComboBox<String>();
-				JButton inputBtn = new JButton("Throw");
+				ApplicationWindow	window		= (ApplicationWindow)arguments[0];
+				Container			contentPane	= window.getContentPane();
+				DiceBag				parent		= ((DiceBag)this.parent);
+				JMenuBar			menuBar		= new JMenuBar();
+				JMenu				toolsMenu	= new JMenu("Tools");
+				JMenuItem			ctOption	= new JMenuItem("Combat Tracker");
+				JMenu				fileMenu	= new JMenu("File");
+				JMenuItem			clearOption	= new JMenuItem("Clear");
+				JMenuItem			openOption	= new JMenuItem("Open");
+				JMenuItem			saveOption	= new JMenuItem("Save");
+				RichTextPane		outputBox	= new RichTextPane(window, true, window.isDebugging(), DiceBag.TEXT_FONT);
+				JComboBox<String>	inputBox	= new JComboBox<String>();
+				JButton				inputBtn	= new JButton("Throw");
 				
 				menuBar.setFont(DiceBag.TEXT_FONT);
 				toolsMenu.setFont(DiceBag.TEXT_FONT);
@@ -196,8 +202,8 @@ public class DiceBag
 				ctOption.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_M, java.awt.Event.CTRL_MASK));
 				ctOption.setMnemonic('M');
 				
-				JScrollPane outputPanel = new JScrollPane(outputBox);
-				JPanel inputPanel = new JPanel();
+				JScrollPane	outputPanel	= new JScrollPane(outputBox);
+				JPanel		inputPanel	= new JPanel();
 				
 				outputBox.setBackground(Color.WHITE);
 				inputBox.setEditable(true);
@@ -210,14 +216,13 @@ public class DiceBag
 				inputPanel.add(inputBtn);
 				contentPane.add(outputPanel, BorderLayout.CENTER);
 				contentPane.add(inputPanel, BorderLayout.SOUTH);
-				((DiceBag)this.parent).setInput(inputBox);
-				((DiceBag)this.parent).setOutput(outputBox);
-				
+				parent.setInput(inputBox);
+				parent.setOutput(outputBox);
 				window.getRootPane().setDefaultButton(inputBtn);
 			}
 		};
 		
-		this.setWindow(new ApplicationWindow(null, "Dice Bag", new Dimension(1000, 580), this.isDebugging(), false, myActionPerformed, myDrawGUI));
+		this.setWindow(new ApplicationWindow(null, "Dice Bag", new Dimension(1000, 580), this.isDebugging(), true, myActionPerformed, myDrawGUI));
 		this.getWindow().setIconImageByResourceName("icon.png");
 		
 		if (!showWindow)
@@ -255,14 +260,14 @@ public class DiceBag
 	
 	public final void openLog()
 	{
-		this.getOutput().openFile();
+		this.getOutput().openOrSaveFile(true);
 		this.getInput().grabFocus();
 	}
 	
 	public int processInput(final String inputString)
 	{
-		boolean isInputBad = true;
-		int retVal = -1;
+		boolean	isInputBad	= true;
+		int		retVal		= -1;
 		
 		if ((inputString != null) && (inputString.isEmpty() == false))
 		{
@@ -273,9 +278,9 @@ public class DiceBag
 					Support.displayDebugMessage(this.getWindow(), "Input: " + inputString + "\n");
 				}
 				
-				String[] paramArray = inputString.split("d");
-				int[] resultsArray = Games.throwDice(Integer.parseInt(paramArray[0]), Integer.parseInt(paramArray[1]));
-				int upperBound = (resultsArray.length - 1);
+				String[]	paramArray		= inputString.split("d");
+				int[]		resultsArray	= Games.throwDice(Integer.parseInt(paramArray[0]), Integer.parseInt(paramArray[1]));
+				int			upperBound		= (resultsArray.length - 1);
 				
 				StringBuilder outputStringBuilder = new StringBuilder();
 				
@@ -285,19 +290,19 @@ public class DiceBag
 				}
 				
 				this.getOutput().append(Color.BLACK, Color.WHITE, "[" + Support.getDateTimeStamp() + "]: ",
-										Color.RED, Color.WHITE, "Input\t\t",
-										Color.GRAY, Color.WHITE, inputString + "\n");
+					Color.RED, Color.WHITE, "Input\t\t",
+					Color.GRAY, Color.WHITE, inputString + "\n");
 				
 				this.getOutput().append(Color.BLACK, Color.WHITE, "[" + Support.getDateTimeStamp() + "]: ",
-										Color.GREEN, Color.WHITE, "Sum\t\t",
-										Color.GRAY, Color.WHITE, resultsArray[upperBound] + "\n");
+					Color.GREEN, Color.WHITE, "Sum\t\t",
+					Color.GRAY, Color.WHITE, resultsArray[upperBound] + "\n");
 				
 				this.getOutput().append(Color.BLACK, Color.WHITE, "[" + Support.getDateTimeStamp() + "]: ",
-										Color.BLUE, Color.WHITE, "Results\t",
-										Color.GRAY, Color.WHITE, outputStringBuilder.toString() + "\n\n");
+					Color.BLUE, Color.WHITE, "Results\t",
+					Color.GRAY, Color.WHITE, outputStringBuilder.toString() + "\n\n");
 				
-				isInputBad = false;
-				retVal = resultsArray[upperBound];
+				isInputBad	= false;
+				retVal		= resultsArray[upperBound];
 				this.getInput().addItem(inputString);
 			}
 		}
@@ -314,11 +319,11 @@ public class DiceBag
 	
 	public final void saveLog()
 	{
-		this.getOutput().saveFile();
+		this.getOutput().openOrSaveFile(false);
 		this.getInput().grabFocus();
 	}
 	
-	public final void setDebugging(final boolean debugMode)
+	protected final void setDebugging(final boolean debugMode)
 	{
 		this.debugMode = debugMode;
 	}
@@ -333,7 +338,7 @@ public class DiceBag
 		this.output = output;
 	}
 	
-	public final void setWindow(final ApplicationWindow window)
+	protected final void setWindow(final ApplicationWindow window)
 	{
 		this.window = window;
 	}
