@@ -658,6 +658,7 @@ public class CombatTracker implements Serializable
 			if (this.getChoiceInput("Would you like to load a previously saved character?", "Load Previously Saved Character?"))
 			{
 				character = new Creature35E(this.getParent(), this, new StatBlock35E());
+				character.openOrSaveFile(this.getWindow(), true, this.isDebugging());
 				
 				if (this.getChoiceInput("Would you like to change this character's current HP?", "Change HP?"))
 				{
@@ -717,11 +718,13 @@ public class CombatTracker implements Serializable
 				
 				if (this.getChoiceInput("Would you like to load previously saved monsters of type " + i + "?", "Load Previously Saved Monsters?"))
 				{
-					final boolean renameLoadedMonsters = this.getChoiceInput("Would you like to rename loaded monsters in numerical order?", "Rename Loaded Monsters?");
+					boolean renameLoadedMonsters = this.getChoiceInput("Would you like to rename loaded monsters in numerical order?",
+																			"Rename Loaded Monsters?");
 					
 					for (int j = 1; j <= numMonsters; j++)
 					{
 						monster = new Creature35E(this.getParent(), this, new StatBlock35E());
+						monster.openOrSaveFile(this.getWindow(), true, this.isDebugging());
 						
 						if (renameLoadedMonsters)
 						{
@@ -743,9 +746,14 @@ public class CombatTracker implements Serializable
 							monster.getStatBlock().setPosition(position);
 						}
 						
-						if (this.getChoiceInput("Would you like to change this Monster's current initiative?", "Change Initiative?"))
+						if (this.getChoiceInput("Would you like to change this monster's current initiative?", "Change Initiative?"))
 						{
 							monster.rollInitiative(false);
+						}
+						
+						if (monster != null)
+						{
+							monsterList.add(monster);
 						}
 					}
 				}
@@ -771,12 +779,12 @@ public class CombatTracker implements Serializable
 						
 						monster.updateStatus();
 						monster.rollInitiative(false);
+						
+						if (monster != null)
+						{
+							monsterList.add(monster);
+						}
 					}
-				}
-							
-				if (monster != null)
-				{
-					monsterList.add(monster);
 				}
 			}
 		}

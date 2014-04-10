@@ -1,9 +1,9 @@
 /*
-	Title:  Point-Buy Calculator
+	Title:  Point Buy Calculator
 	Author: Matthew Boyette
 	Date:   4/9/2014
 	
-	This simple module calculates ability score distributions using a point-buy system.
+	This simple module calculates ability score distributions using a point buy system.
 */
 
 package org.dicebag.modules;
@@ -16,6 +16,6 @@ public class PointBuyCalculator implements Serializable
 	
 	public PointBuyCalculator()
 	{
-		// TODO: Point-Buy Calculator.
+		// TODO: Point Buy Calculator.
 	}
 }

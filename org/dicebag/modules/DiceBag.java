@@ -123,9 +123,19 @@ public class DiceBag implements Serializable
 							parent.openLog();
 							break;
 							
-						case "Point-Buy Calculator":
+						case "Point Buy Calculator":
 							
 							new PointBuyCalculator();
+							break;
+							
+						case "Challenge Rating Calculator":
+							
+							new ChallengeRatingCalculator();
+							break;
+							
+						case "Encounter Level Calculator":
+							
+							new EncounterLevelCalculator();
 							break;
 						
 						case "Save":
@@ -174,7 +184,9 @@ public class DiceBag implements Serializable
 				JMenuBar			menuBar		= new JMenuBar();
 				JMenu				toolsMenu	= new JMenu("Tools");
 				JMenuItem			ctOption	= new JMenuItem("Combat Tracker");
-				JMenuItem			pbOption	= new JMenuItem("Point-Buy Calculator");
+				JMenuItem			pbOption	= new JMenuItem("Point Buy Calculator");
+				JMenuItem			crOption	= new JMenuItem("Challenge Rating Calculator");
+				JMenuItem			elOption	= new JMenuItem("Encounter Level Calculator");
 				JMenu				fileMenu	= new JMenu("File");
 				JMenuItem			clearOption	= new JMenuItem("Clear");
 				JMenuItem			openOption	= new JMenuItem("Open");
@@ -187,6 +199,8 @@ public class DiceBag implements Serializable
 				toolsMenu.setFont(DiceBag.TEXT_FONT);
 				ctOption.setFont(DiceBag.TEXT_FONT);
 				pbOption.setFont(DiceBag.TEXT_FONT);
+				crOption.setFont(DiceBag.TEXT_FONT);
+				elOption.setFont(DiceBag.TEXT_FONT);
 				fileMenu.setFont(DiceBag.TEXT_FONT);
 				clearOption.setFont(DiceBag.TEXT_FONT);
 				openOption.setFont(DiceBag.TEXT_FONT);
@@ -200,7 +214,11 @@ public class DiceBag implements Serializable
 				fileMenu.add(saveOption);
 				menuBar.add(fileMenu);
 				ctOption.addActionListener(window);
+				crOption.addActionListener(window);
+				elOption.addActionListener(window);
 				toolsMenu.add(ctOption);
+				toolsMenu.add(crOption);
+				toolsMenu.add(elOption);
 				pbOption.addActionListener(window);
 				toolsMenu.add(pbOption);
 				menuBar.add(toolsMenu);
@@ -214,10 +232,14 @@ public class DiceBag implements Serializable
 				saveOption.setMnemonic('S');
 				clearOption.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_D, java.awt.Event.CTRL_MASK));
 				clearOption.setMnemonic('C');
-				ctOption.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_M, java.awt.Event.CTRL_MASK));
+				ctOption.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_M, java.awt.Event.ALT_MASK));
 				ctOption.setMnemonic('M');
-				pbOption.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_B, java.awt.Event.CTRL_MASK));
+				pbOption.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_B, java.awt.Event.ALT_MASK));
 				pbOption.setMnemonic('B');
+				crOption.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_C, java.awt.Event.ALT_MASK));
+				crOption.setMnemonic('C');
+				elOption.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_E, java.awt.Event.ALT_MASK));
+				elOption.setMnemonic('E');
 				
 				JScrollPane	outputPanel	= new JScrollPane(outputBox);
 				JPanel		inputPanel	= new JPanel();
