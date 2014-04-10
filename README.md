@@ -38,7 +38,27 @@ In future versions, traps will be fully supported so that moving to a particular
 
 *******************************************************************
 
-This simple module calculates ability score distributions using a point-buy system.
+This simple module calculates ability score distributions using a point buy system.
+
+*******************************************************************
+
+* Title:  ChallengeRatingCalculator
+* Author: [Matthew Boyette](mailto:Dyndrilliac@gmail.com)
+* Date:   4/10/2014
+
+*******************************************************************
+
+This simple module calculates challenge ratings.
+
+*******************************************************************
+
+* Title:  EncounterLevelCalculator
+* Author: [Matthew Boyette](mailto:Dyndrilliac@gmail.com)
+* Date:   4/10/2014
+
+*******************************************************************
+
+This simple module calculates encounter levels.
 
 *******************************************************************
 
