@@ -11,6 +11,8 @@
 	Examples: 3d6, 2d8, 1d20, 15D6, 10D10, 4D4, etc.
 */
 
+package org.dicebag.modules;
+
 import api.gui.ApplicationWindow;
 import api.gui.RichTextPane;
 import api.util.EventHandler;
@@ -75,6 +77,8 @@ public class DiceBag implements Serializable
 		// Define a self-contained ActionListener event handler.
 		EventHandler myActionPerformed = new EventHandler(this)
 		{
+			private final static long	serialVersionUID	= 1L;
+
 			@Override
 			public final void run(final Object... arguments) throws IllegalArgumentException, RuntimeException
 			{
@@ -118,6 +122,11 @@ public class DiceBag implements Serializable
 							
 							parent.openLog();
 							break;
+							
+						case "Point-Buy Calculator":
+							
+							new PointBuyCalculator();
+							break;
 						
 						case "Save":
 							
@@ -145,6 +154,8 @@ public class DiceBag implements Serializable
 		// Define a self-contained interface construction event handler.
 		EventHandler myDrawGUI = new EventHandler(this)
 		{
+			private final static long	serialVersionUID	= 1L;
+
 			@Override
 			public final void run(final Object... arguments) throws IllegalArgumentException
 			{
@@ -163,6 +174,7 @@ public class DiceBag implements Serializable
 				JMenuBar			menuBar		= new JMenuBar();
 				JMenu				toolsMenu	= new JMenu("Tools");
 				JMenuItem			ctOption	= new JMenuItem("Combat Tracker");
+				JMenuItem			pbOption	= new JMenuItem("Point-Buy Calculator");
 				JMenu				fileMenu	= new JMenu("File");
 				JMenuItem			clearOption	= new JMenuItem("Clear");
 				JMenuItem			openOption	= new JMenuItem("Open");
@@ -174,6 +186,7 @@ public class DiceBag implements Serializable
 				menuBar.setFont(DiceBag.TEXT_FONT);
 				toolsMenu.setFont(DiceBag.TEXT_FONT);
 				ctOption.setFont(DiceBag.TEXT_FONT);
+				pbOption.setFont(DiceBag.TEXT_FONT);
 				fileMenu.setFont(DiceBag.TEXT_FONT);
 				clearOption.setFont(DiceBag.TEXT_FONT);
 				openOption.setFont(DiceBag.TEXT_FONT);
@@ -188,6 +201,8 @@ public class DiceBag implements Serializable
 				menuBar.add(fileMenu);
 				ctOption.addActionListener(window);
 				toolsMenu.add(ctOption);
+				pbOption.addActionListener(window);
+				toolsMenu.add(pbOption);
 				menuBar.add(toolsMenu);
 				window.setJMenuBar(menuBar);
 				
@@ -201,6 +216,8 @@ public class DiceBag implements Serializable
 				clearOption.setMnemonic('C');
 				ctOption.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_M, java.awt.Event.CTRL_MASK));
 				ctOption.setMnemonic('M');
+				pbOption.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_B, java.awt.Event.CTRL_MASK));
+				pbOption.setMnemonic('B');
 				
 				JScrollPane	outputPanel	= new JScrollPane(outputBox);
 				JPanel		inputPanel	= new JPanel();
@@ -219,10 +236,11 @@ public class DiceBag implements Serializable
 				parent.setInput(inputBox);
 				parent.setOutput(outputBox);
 				window.getRootPane().setDefaultButton(inputBtn);
+				window.setFont(DiceBag.TEXT_FONT);
 			}
 		};
 		
-		this.setWindow(new ApplicationWindow(null, "Dice Bag", new Dimension(1000, 580), this.isDebugging(), true, myActionPerformed, myDrawGUI));
+		this.setWindow(new ApplicationWindow(null, "Dice Bag", new Dimension(1100, 600), this.isDebugging(), true, myActionPerformed, myDrawGUI));
 		this.getWindow().setIconImageByResourceName("icon.png");
 		
 		if (!showWindow)

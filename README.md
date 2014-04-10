@@ -22,13 +22,23 @@ A pre-compiled JAR binary can be downloaded from [this link](https://www.dropbox
 
 *******************************************************************
 
-This class is an add-on module for DiceBag which allows a DM to track combat information like health, initiative, and the current round. It interfaces with the DiceBag class so that initiative die rolls are recorded in the log automatically. Currently only the v3.5 d20 rules are implemented but in a future version users will be able to seamlessly switch configurations.
+This class is an add-on module for DiceBag which allows a DM to track combat information like health, initiative, and the current round. It interfaces with the DiceBag class so that initiative die rolls are recorded in the log automatically. Currently only the v3.5 d20 rules are implemented but in a future version users will be able to seamlessly switch configurations. Saving and loading combatants is also an option, as is only resetting characters or monsters if desired.
 
 CombatTracker can also be used to track battlefield position. The input for position tracking will require the information to be in a specific format. A link to a sample blank battle grid is provided below. It features 108 squares in a 9x12 configuration using the format "X:YY" where the Y coordinate is zero-padded so each position is a single fixed width. Coordinates begin counting at one, not zero. Only positive integers are allowed.
 
 [Sample Blank Battle Grid](https://www.dropbox.com/s/i1gcz06x7tpyqge/Blank_Battle_Grid.pdf)
 
-In future versions, traps will be fully supported so that moving to a particular square will trigger the trap's effects automatically. Another planned future feature is for the user to be able to enter damage and healing in more flexible formats, such us 1d6+4.
+In future versions, traps will be fully supported so that moving to a particular square will trigger the trap's effects automatically. Another planned future feature is for the user to be able to enter damage and healing in more flexible formats, such as '1d6+4'.
+
+*******************************************************************
+
+* Title:  PointBuyCalculator
+* Author: [Matthew Boyette](mailto:Dyndrilliac@gmail.com)
+* Date:   4/9/2014
+
+*******************************************************************
+
+This simple module calculates ability score distributions using a point-buy system.
 
 *******************************************************************
 
@@ -38,18 +48,54 @@ In future versions, traps will be fully supported so that moving to a particular
 
 *******************************************************************
 
-This class is a common resource for the DiceBag module and its add-on modules to use. It was originally located nested within the CombatTracker class but I have separated it out to avoid duplicating code when using similar objects in other modules.
-
-This class is an abstract class that other classes extend. This allows for alternative initiative logic, different HP thresholds, and other customized programming.
+This class is a common resource for the DiceBag module and its add-on modules to use. It was originally nested within the CombatTracker class but I have since separated it out to avoid duplicating code when using similar objects in other modules. This class is an abstract class that other classes are meant to inherit and extend.
 
 *******************************************************************
 
-* Title:  CreatureV35
+* Title:  Creature35E
 * Author: [Matthew Boyette](mailto:Dyndrilliac@gmail.com)
-* Date:   4/07/2014
+* Date:   4/7/2014
 
 *******************************************************************
 
-This class is a common resource for the DiceBag module and its add-on modules to use. It was originally located nested within the CombatTracker class but I have separated it out to avoid duplicating code when using similar objects in other modules.
-	
-CreatureV35 is the default Creature type in DiceBag, and is just a non-abstract version of Creature. It represents a D&D 3.5 creature.
+This class is a common resource for the DiceBag module and its add-on modules to use. Creature35E is the default Creature type in DiceBag. It represents a standard D&D 3.5E creature.
+
+*******************************************************************
+
+* Title:  StatBlock
+* Author: [Matthew Boyette](mailto:Dyndrilliac@gmail.com)
+* Date:   4/9/2014
+
+*******************************************************************
+
+This class is a common resource for the DiceBag module and its add-on modules to use. It is a companion for the Creature class. It represents the stat block for a creature.
+
+*******************************************************************
+
+* Title:  StatBlock35E
+* Author: [Matthew Boyette](mailto:Dyndrilliac@gmail.com)
+* Date:   4/9/2014
+
+*******************************************************************
+
+This class is a common resource for the DiceBag module and its add-on modules to use. It is a companion for the Creature35E class. It represents the stat block for a standard D&D 3.5E creature.
+
+*******************************************************************
+
+* Title:  Constants
+* Author: [Matthew Boyette](mailto:Dyndrilliac@gmail.com)
+* Date:   4/9/2014
+
+*******************************************************************
+
+This class is a common resource for the DiceBag module and its add-on modules to use. It is a companion for the Creature class. It represents constants useful to a creature.
+
+*******************************************************************
+
+* Title:  Constants35E
+* Author: [Matthew Boyette](mailto:Dyndrilliac@gmail.com)
+* Date:   4/9/2014
+
+*******************************************************************
+
+This class is a common resource for the DiceBag module and its add-on modules to use. It is a companion for the Creature35E class. It represents constants useful to a standard D&D 3.5E creature.
