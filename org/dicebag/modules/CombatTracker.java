@@ -314,27 +314,37 @@ public class CombatTracker implements Serializable
 					throw new IllegalArgumentException("myDrawGUI Error : argument[0] is of incorrect type.");
 				}
 				
+				/*
+					Declare & Initialize GUI Objects 
+				*/
+				
 				ApplicationWindow	window			= (ApplicationWindow)arguments[0];
 				Container			contentPane		= window.getContentPane();
-				CombatTracker		combatTracker	= (CombatTracker)this.parent;
+				CombatTracker		parent			= (CombatTracker)this.parent;
 				JMenuBar			menuBar			= new JMenuBar();
 				JMenu				targetMenu		= new JMenu("Target Actions");
 				JMenuItem			optSave			= new JMenuItem("Save Target");
 				JMenuItem			optDamage		= new JMenuItem("Damage Target");
 				JMenuItem			optHeal			= new JMenuItem("Heal Target");
 				JMenuItem			optMove			= new JMenuItem("Move Target");
-				
 				JMenu				currentMenu		= new JMenu("Current Actions");
 				JMenuItem			opcSave			= new JMenuItem("Save Current");
 				JMenuItem			opcDamage		= new JMenuItem("Damage Current");
 				JMenuItem			opcHeal			= new JMenuItem("Heal Current");
 				JMenuItem			opcMove			= new JMenuItem("Move Current");
 				JMenuItem			opcNext			= new JMenuItem("Next Combatant");
-				
 				JMenu				resetMenu		= new JMenu("Reset Combat");
-				JMenuItem			opResetAll		= new JMenuItem("Reset All Creatures");
-				JMenuItem			opResetChars	= new JMenuItem("Reset Characters Only");
-				JMenuItem			opResetMons		= new JMenuItem("Reset Monsters Only");
+				JMenuItem			oprAll			= new JMenuItem("Reset All Creatures");
+				JMenuItem			oprChars		= new JMenuItem("Reset Characters Only");
+				JMenuItem			oprMons			= new JMenuItem("Reset Monsters Only");
+				JLabel				curLabel		= new JLabel("Current: " + parent.getCurrentCreature().toString());
+				JPanel				curPanel		= new JPanel();
+				JLabel				cboLabel		= new JLabel("Target: ");
+				JPanel				cboPanel		= new JPanel();
+				
+				/*
+					Configure Menu Bar 
+				*/
 				
 				menuBar.setFont(CombatTracker.TEXT_FONT);
 				targetMenu.setFont(CombatTracker.TEXT_FONT);
@@ -360,12 +370,12 @@ public class CombatTracker implements Serializable
 				opcNext.addActionListener(window);
 				
 				resetMenu.setFont(CombatTracker.TEXT_FONT);
-				opResetAll.setFont(CombatTracker.TEXT_FONT);
-				opResetAll.addActionListener(window);
-				opResetChars.setFont(CombatTracker.TEXT_FONT);
-				opResetChars.addActionListener(window);
-				opResetMons.setFont(CombatTracker.TEXT_FONT);
-				opResetMons.addActionListener(window);
+				oprAll.setFont(CombatTracker.TEXT_FONT);
+				oprAll.addActionListener(window);
+				oprChars.setFont(CombatTracker.TEXT_FONT);
+				oprChars.addActionListener(window);
+				oprMons.setFont(CombatTracker.TEXT_FONT);
+				oprMons.addActionListener(window);
 				
 				targetMenu.setMnemonic('T');
 				optSave.setMnemonic('S');
@@ -390,12 +400,12 @@ public class CombatTracker implements Serializable
 				opcNext.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_N, java.awt.Event.CTRL_MASK));
 				
 				resetMenu.setMnemonic('R');
-				opResetAll.setMnemonic('A');
-				opResetAll.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, java.awt.Event.SHIFT_MASK));
-				opResetChars.setMnemonic('C');
-				opResetChars.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_C, java.awt.Event.SHIFT_MASK));
-				opResetMons.setMnemonic('M');
-				opResetMons.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_M, java.awt.Event.SHIFT_MASK));
+				oprAll.setMnemonic('A');
+				oprAll.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, java.awt.Event.SHIFT_MASK));
+				oprChars.setMnemonic('C');
+				oprChars.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_C, java.awt.Event.SHIFT_MASK));
+				oprMons.setMnemonic('M');
+				oprMons.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_M, java.awt.Event.SHIFT_MASK));
 				
 				targetMenu.add(optSave);
 				targetMenu.add(optDamage);
@@ -407,26 +417,25 @@ public class CombatTracker implements Serializable
 				currentMenu.add(opcMove);
 				currentMenu.addSeparator();
 				currentMenu.add(opcNext);
-				resetMenu.add(opResetAll);
-				resetMenu.add(opResetChars);
-				resetMenu.add(opResetMons);
+				resetMenu.add(oprAll);
+				resetMenu.add(oprChars);
+				resetMenu.add(oprMons);
 				menuBar.add(targetMenu);
 				menuBar.add(currentMenu);
 				menuBar.add(resetMenu);
 				
-				JLabel	curLabel	= new JLabel("Current: " + combatTracker.getCurrentCreature().toString());
-				JPanel	curPanel	= new JPanel();
-				JLabel	cboLabel	= new JLabel("Target: ");
-				JPanel	cboPanel	= new JPanel();
+				/*
+					Configure Form Elements
+				*/
 
-				combatTracker.setCboCreatureList(new JComboBox<Creature>());
-				combatTracker.getCboCreatureList().setFont(CombatTracker.TEXT_FONT);
-				combatTracker.getCboCreatureList().setEditable(false);
+				parent.setCboCreatureList(new JComboBox<Creature>());
+				parent.getCboCreatureList().setFont(CombatTracker.TEXT_FONT);
+				parent.getCboCreatureList().setEditable(false);
 				
 				cboLabel.setFont(CombatTracker.TEXT_FONT);
 				cboPanel.setLayout(new FlowLayout());
 				cboPanel.add(cboLabel);
-				cboPanel.add(combatTracker.getCboCreatureList());
+				cboPanel.add(parent.getCboCreatureList());
 				curLabel.setFont(CombatTracker.TEXT_FONT);
 				curPanel.setLayout(new FlowLayout());
 				curPanel.add(curLabel);
@@ -434,16 +443,16 @@ public class CombatTracker implements Serializable
 				contentPane.add(curPanel, BorderLayout.NORTH);
 				contentPane.add(cboPanel, BorderLayout.CENTER);
 				
-				combatTracker.setLblCurrentCreature(curLabel);
+				parent.setLblCurrentCreature(curLabel);
 				
-				for (int i = 0; i < combatTracker.getCreatureList().size(); i++)
+				for (int i = 0; i < parent.getCreatureList().size(); i++)
 				{
-					combatTracker.getCboCreatureList().addItem(combatTracker.getCreatureList().get(i));
+					parent.getCboCreatureList().addItem(parent.getCreatureList().get(i));
 				}
 				
-				combatTracker.getCboCreatureList().setSelectedIndex(combatTracker.getCreatureList().indexOf(combatTracker.getCurrentCreature()));
+				parent.getCboCreatureList().setSelectedIndex(parent.getCreatureList().indexOf(parent.getCurrentCreature()));
 				window.setJMenuBar(menuBar);
-				window.setTitle(CombatTracker.WINDOW_TITLE + combatTracker.getNumRounds());
+				window.setTitle(CombatTracker.WINDOW_TITLE + parent.getNumRounds());
 				window.setFont(CombatTracker.TEXT_FONT);
 			}
 		};

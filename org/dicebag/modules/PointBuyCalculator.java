@@ -14,7 +14,7 @@ public class PointBuyCalculator implements Serializable
 {
 	private final static long	serialVersionUID	= 1L;
 	
-	public PointBuyCalculator()
+	public PointBuyCalculator(final DiceBag parent, final boolean isDebugging)
 	{
 		// TODO: Point Buy Calculator.
 	}

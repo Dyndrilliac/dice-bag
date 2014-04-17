@@ -9,18 +9,18 @@
 
 package org.dicebag.objects;
 
+import org.dicebag.modules.CombatTracker;
+import org.dicebag.modules.DiceBag;
+
+import api.gui.RichTextPane;
+import api.util.Support;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-
-import org.dicebag.modules.CombatTracker;
-import org.dicebag.modules.DiceBag;
-
-import api.gui.RichTextPane;
-import api.util.Support;
 
 public final class Creature35E extends Creature
 {
@@ -36,12 +36,21 @@ public final class Creature35E extends Creature
 	@Override
 	public final int compareTo(final Creature creature)
 	{
-		if (creature.getStatBlock().getTotalInit() == this.getStatBlock().getTotalInit())
+		if (creature.getStatBlock().getTotalInit() != this.getStatBlock().getTotalInit())
 		{
-			// If two creatures have the same total initiative, the one with the higher bonus acts first.
-			if (creature.getStatBlock().getInitBonus() == this.getStatBlock().getInitBonus())
+			// By default, the creature with the highest total initiative acts first. Turns then proceed in descending order of initiative.
+			return (creature.getStatBlock().getTotalInit() - this.getStatBlock().getTotalInit());
+		}
+		else
+		{
+			// If two creatures have the same total initiative, the one with the higher initiative bonus acts first.
+			if (creature.getStatBlock().getInitBonus() != this.getStatBlock().getInitBonus())
 			{
-				// If two creatures have the same total initiative and bonus, then they both roll d20 tie-breakers until there is a winner.
+				return (creature.getStatBlock().getInitBonus() - this.getStatBlock().getInitBonus());
+			}
+			else
+			{
+				// If two creatures have the same total initiative and initiative bonus, then they both roll d20 tie-breakers until there is a winner.
 				do
 				{
 					if ((creature.getDiceRoller() != null) && (this.getDiceRoller() != null))
@@ -54,15 +63,6 @@ public final class Creature35E extends Creature
 				
 				return (creature.getStatBlock().getTieBreaker() - this.getStatBlock().getTieBreaker());
 			}
-			else
-			{
-				return (creature.getStatBlock().getInitBonus() - this.getStatBlock().getInitBonus());
-			}
-		}
-		else
-		{
-			// By default, the creature with the highest total initiative acts first. Turns then proceed in descending order of initiative.
-			return (creature.getStatBlock().getTotalInit() - this.getStatBlock().getTotalInit());
 		}
 	}
 	

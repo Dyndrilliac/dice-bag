@@ -42,23 +42,13 @@ This simple module calculates ability score distributions using a point buy syst
 
 *******************************************************************
 
-* Title:  ChallengeRatingCalculator
+* Title:  EncounterCalculator
 * Author: [Matthew Boyette](mailto:Dyndrilliac@gmail.com)
 * Date:   4/10/2014
 
 *******************************************************************
 
-This simple module calculates challenge ratings.
-
-*******************************************************************
-
-* Title:  EncounterLevelCalculator
-* Author: [Matthew Boyette](mailto:Dyndrilliac@gmail.com)
-* Date:   4/10/2014
-
-*******************************************************************
-
-This simple module calculates encounter levels.
+This simple module calculates encounter levels, encounter difficulty, standard XP rewards, and standard treasure rewards based on the number of enemies, number of players, the challenge ratings of each enemy, and the effective character level of each player.
 
 *******************************************************************
 

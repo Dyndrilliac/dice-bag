@@ -125,17 +125,12 @@ public class DiceBag implements Serializable
 							
 						case "Point Buy Calculator":
 							
-							new PointBuyCalculator();
-							break;
-							
-						case "Challenge Rating Calculator":
-							
-							new ChallengeRatingCalculator();
+							new PointBuyCalculator(parent, parent.isDebugging());
 							break;
 							
 						case "Encounter Level Calculator":
 							
-							new EncounterLevelCalculator();
+							new EncounterCalculator(parent, parent.isDebugging());
 							break;
 						
 						case "Save":
@@ -178,71 +173,74 @@ public class DiceBag implements Serializable
 					throw new IllegalArgumentException("myDrawGUI Error : argument[0] is of incorrect type.");
 				}
 				
+				/*
+					Declare & Initialize GUI Objects 
+				*/
+				
 				ApplicationWindow	window		= (ApplicationWindow)arguments[0];
 				Container			contentPane	= window.getContentPane();
 				DiceBag				parent		= ((DiceBag)this.parent);
 				JMenuBar			menuBar		= new JMenuBar();
-				JMenu				toolsMenu	= new JMenu("Tools");
-				JMenuItem			ctOption	= new JMenuItem("Combat Tracker");
-				JMenuItem			pbOption	= new JMenuItem("Point Buy Calculator");
-				JMenuItem			crOption	= new JMenuItem("Challenge Rating Calculator");
-				JMenuItem			elOption	= new JMenuItem("Encounter Level Calculator");
 				JMenu				fileMenu	= new JMenu("File");
 				JMenuItem			clearOption	= new JMenuItem("Clear");
 				JMenuItem			openOption	= new JMenuItem("Open");
 				JMenuItem			saveOption	= new JMenuItem("Save");
+				JMenu				toolsMenu	= new JMenu("Tools");
+				JMenuItem			ctOption	= new JMenuItem("Combat Tracker");
+				JMenuItem			elOption	= new JMenuItem("Encounter Calculator");
+				JMenuItem			pbOption	= new JMenuItem("Point Buy Calculator");
 				RichTextPane		outputBox	= new RichTextPane(window, true, window.isDebugging(), DiceBag.TEXT_FONT);
+				JScrollPane			outputPanel	= new JScrollPane(outputBox);
 				JComboBox<String>	inputBox	= new JComboBox<String>();
 				JButton				inputBtn	= new JButton("Throw");
+				JPanel				inputPanel	= new JPanel();
 				
-				menuBar.setFont(DiceBag.TEXT_FONT);
-				toolsMenu.setFont(DiceBag.TEXT_FONT);
-				ctOption.setFont(DiceBag.TEXT_FONT);
-				pbOption.setFont(DiceBag.TEXT_FONT);
-				crOption.setFont(DiceBag.TEXT_FONT);
-				elOption.setFont(DiceBag.TEXT_FONT);
-				fileMenu.setFont(DiceBag.TEXT_FONT);
+				/*
+					Configure Menu Bar
+				*/
+				
 				clearOption.setFont(DiceBag.TEXT_FONT);
-				openOption.setFont(DiceBag.TEXT_FONT);
-				saveOption.setFont(DiceBag.TEXT_FONT);
-				contentPane.setLayout(new BorderLayout());
+				clearOption.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_D, java.awt.Event.CTRL_MASK));
+				clearOption.setMnemonic('C');
 				clearOption.addActionListener(window);
-				fileMenu.add(clearOption);
+				openOption.setFont(DiceBag.TEXT_FONT);
+				openOption.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.Event.CTRL_MASK));
+				openOption.setMnemonic('O');
 				openOption.addActionListener(window);
-				fileMenu.add(openOption);
+				saveOption.setFont(DiceBag.TEXT_FONT);
+				saveOption.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.Event.CTRL_MASK));
+				saveOption.setMnemonic('S');
 				saveOption.addActionListener(window);
+				fileMenu.setFont(DiceBag.TEXT_FONT);
+				fileMenu.setMnemonic('F');
+				fileMenu.add(clearOption);
+				fileMenu.add(openOption);
 				fileMenu.add(saveOption);
-				menuBar.add(fileMenu);
+				ctOption.setFont(DiceBag.TEXT_FONT);
+				ctOption.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_C, java.awt.Event.ALT_MASK));
+				ctOption.setMnemonic('C');
 				ctOption.addActionListener(window);
-				crOption.addActionListener(window);
+				elOption.setFont(DiceBag.TEXT_FONT);
+				elOption.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_E, java.awt.Event.ALT_MASK));
+				elOption.setMnemonic('E');
 				elOption.addActionListener(window);
-				toolsMenu.add(ctOption);
-				toolsMenu.add(crOption);
-				toolsMenu.add(elOption);
+				pbOption.setFont(DiceBag.TEXT_FONT);
+				pbOption.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_P, java.awt.Event.ALT_MASK));
+				pbOption.setMnemonic('P');
 				pbOption.addActionListener(window);
+				toolsMenu.setFont(DiceBag.TEXT_FONT);
+				toolsMenu.setMnemonic('T');
+				toolsMenu.add(ctOption);
+				toolsMenu.add(elOption);
 				toolsMenu.add(pbOption);
+				menuBar.setFont(DiceBag.TEXT_FONT);
+				menuBar.add(fileMenu);
 				menuBar.add(toolsMenu);
 				window.setJMenuBar(menuBar);
 				
-				toolsMenu.setMnemonic('T');
-				fileMenu.setMnemonic('F');
-				openOption.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.Event.CTRL_MASK));
-				openOption.setMnemonic('O');
-				saveOption.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.Event.CTRL_MASK));
-				saveOption.setMnemonic('S');
-				clearOption.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_D, java.awt.Event.CTRL_MASK));
-				clearOption.setMnemonic('C');
-				ctOption.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_M, java.awt.Event.ALT_MASK));
-				ctOption.setMnemonic('M');
-				pbOption.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_B, java.awt.Event.ALT_MASK));
-				pbOption.setMnemonic('B');
-				crOption.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_C, java.awt.Event.ALT_MASK));
-				crOption.setMnemonic('C');
-				elOption.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_E, java.awt.Event.ALT_MASK));
-				elOption.setMnemonic('E');
-				
-				JScrollPane	outputPanel	= new JScrollPane(outputBox);
-				JPanel		inputPanel	= new JPanel();
+				/*
+					Configure Form Elements
+				*/
 				
 				outputBox.setBackground(Color.WHITE);
 				inputBox.setEditable(true);
