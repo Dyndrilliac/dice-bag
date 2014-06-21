@@ -26,7 +26,7 @@ This class is an add-on module for DiceBag which allows a DM to track combat inf
 
 CombatTracker can also be used to track battlefield position. The input for position tracking will require the information to be in a specific format. A link to a sample blank battle grid is provided below. It features 108 squares in a 9x12 configuration using the format "X:YY" where the Y coordinate is zero-padded so each position is a single fixed width. Coordinates begin counting at one, not zero. Only positive integers are allowed.
 
-[Sample Blank Battle Grid](https://www.dropbox.com/s/i1gcz06x7tpyqge/Blank_Battle_Grid.pdf)
+[Sample Blank Battle Grid](https://www.dropbox.com/s/rszsx431xq87tz2/Blank_Battle_Grid.pdf)
 
 In future versions, traps will be fully supported so that moving to a particular square will trigger the trap's effects automatically. Another planned future feature is for the user to be able to enter damage and healing in more flexible formats, such as '1d6+4'.
 
