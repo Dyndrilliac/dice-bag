@@ -19,12 +19,12 @@ import api.util.EventHandler;
 import api.util.Games;
 import api.util.Support;
 
+import java.awt.AWTEvent;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.io.Serializable;
 
@@ -42,7 +42,7 @@ public class DiceBag implements Serializable
 {
 	public final static class UniqueComboBoxModel extends DefaultComboBoxModel<String>
 	{
-		private final static long	serialVersionUID	= 1L;
+		private final static long serialVersionUID = 1L;
 		
 		@Override
 		public final void addElement(final String s)
@@ -55,49 +55,34 @@ public class DiceBag implements Serializable
 	}
 	
 	private final static long	serialVersionUID		= 1L;
-	public final static Font	TEXT_FONT				= new Font("Lucida Console", Font.PLAIN, 14);
-	public final static String	INPUT_EXCEPTION_STRING	= "Incorrect input format! Provide two non-negative integers separated by the character 'd'." +
+	public	final static String	INPUT_EXCEPTION_STRING	= "Incorrect input format! Provide two non-negative integers separated by the character 'd'." +
 															"\nThe 'd' is not case sensitve." +
 															"\nExamples: 3d6, 2d8, 1d20, 15D6, 10D10, 4D4, etc.";
 	
 	public final static void main(final String[] args)
 	{
-		new DiceBag(true);
+		new DiceBag(true, args);
 	}
 	
-	private boolean				debugMode	= false;
+	private boolean				isDebugging	= false;
 	private JComboBox<String>	input		= null;
 	private RichTextPane		output		= null;
 	private ApplicationWindow	window		= null;
 	
-	public DiceBag(final boolean showWindow)
+	public DiceBag(final boolean showWindow, final String[] args)
 	{
 		this.setDebugging(Support.promptDebugMode(this.getWindow()));
 		
 		// Define a self-contained ActionListener event handler.
-		EventHandler myActionPerformed = new EventHandler(this)
+		EventHandler<DiceBag> myActionPerformed = new EventHandler<DiceBag>(this)
 		{
-			private final static long	serialVersionUID	= 1L;
+			private final static long serialVersionUID = 1L;
 
 			@Override
-			public final void run(final Object... arguments) throws IllegalArgumentException, RuntimeException
+			public final void run(final AWTEvent event)
 			{
-				if ((arguments.length <= 1) || (arguments.length > 2))
-				{
-					throw new IllegalArgumentException("myActionPerformed Error : incorrect number of arguments.");
-				}
-				else if (!(arguments[0] instanceof ActionEvent))
-				{
-					throw new IllegalArgumentException("myActionPerformed Error : argument[0] is of incorrect type.");
-				}
-				else if (!(arguments[1] instanceof ApplicationWindow))
-				{
-					throw new IllegalArgumentException("myActionPerformed Error : argument[1] is of incorrect type.");
-				}
-				
-				ActionEvent			event	= (ActionEvent)arguments[0];
-				//ApplicationWindow	window	= (ApplicationWindow)arguments[1];
-				DiceBag				parent	= ((DiceBag)this.parent);
+				ActionEvent	actionEvent	= (ActionEvent)event;
+				DiceBag		parent		= this.getParent();
 				
 				if ((parent.getOutput() != null) && (parent.getInput() != null))
 				{
@@ -106,11 +91,12 @@ public class DiceBag implements Serializable
 						This generally produces more efficient byte code compared to a chain of if statements.
 						http://docs.oracle.com/javase/7/docs/technotes/guides/language/strings-switch.html
 					*/
-					switch (event.getActionCommand())
+					switch (actionEvent.getActionCommand())
 					{
 						case "Clear":
 							
-							parent.clearLog();
+							parent.getOutput().clear();
+							parent.getInput().grabFocus();
 							break;
 						
 						case "Combat Tracker":
@@ -120,7 +106,8 @@ public class DiceBag implements Serializable
 						
 						case "Open":
 							
-							parent.openLog();
+							parent.getOutput().openOrSaveFile(true);
+							parent.getInput().grabFocus();
 							break;
 							
 						case "Point Buy Calculator":
@@ -135,7 +122,8 @@ public class DiceBag implements Serializable
 						
 						case "Save":
 							
-							parent.saveLog();
+							parent.getOutput().openOrSaveFile(false);
+							parent.getInput().grabFocus();
 							break;
 						
 						case "Throw":
@@ -157,96 +145,72 @@ public class DiceBag implements Serializable
 		};
 		
 		// Define a self-contained interface construction event handler.
-		EventHandler myDrawGUI = new EventHandler(this)
+		EventHandler<DiceBag> myDrawGUI = new EventHandler<DiceBag>(this)
 		{
-			private final static long	serialVersionUID	= 1L;
+			private final static long serialVersionUID = 1L;
 
 			@Override
-			public final void run(final Object... arguments) throws IllegalArgumentException
+			public final void run(final ApplicationWindow window)
 			{
-				if (arguments.length <= 0)
-				{
-					throw new IllegalArgumentException("myDrawGUI Error : incorrect number of arguments.");
-				}
-				else if (!(arguments[0] instanceof ApplicationWindow))
-				{
-					throw new IllegalArgumentException("myDrawGUI Error : argument[0] is of incorrect type.");
-				}
-				
-				/*
-					Declare & Initialize GUI Objects 
-				*/
-				
-				ApplicationWindow	window		= (ApplicationWindow)arguments[0];
+				DiceBag				parent		= this.getParent();
 				Container			contentPane	= window.getContentPane();
-				DiceBag				parent		= ((DiceBag)this.parent);
 				JMenuBar			menuBar		= new JMenuBar();
 				JMenu				fileMenu	= new JMenu("File");
 				JMenuItem			clearOption	= new JMenuItem("Clear");
 				JMenuItem			openOption	= new JMenuItem("Open");
 				JMenuItem			saveOption	= new JMenuItem("Save");
 				JMenu				toolsMenu	= new JMenu("Tools");
-				JMenuItem			ctOption	= new JMenuItem("Combat Tracker");
+				JMenuItem 			ctOption	= new JMenuItem("Combat Tracker");
 				JMenuItem			elOption	= new JMenuItem("Encounter Calculator");
 				JMenuItem			pbOption	= new JMenuItem("Point Buy Calculator");
-				RichTextPane		outputBox	= new RichTextPane(window, true, window.isDebugging(), DiceBag.TEXT_FONT);
+				RichTextPane		outputBox	= new RichTextPane(window, true, window.isDebugging());
 				JScrollPane			outputPanel	= new JScrollPane(outputBox);
 				JComboBox<String>	inputBox	= new JComboBox<String>();
 				JButton				inputBtn	= new JButton("Throw");
-				JPanel				inputPanel	= new JPanel();
+				JPanel 				inputPanel	= new JPanel();
 				
-				/*
-					Configure Menu Bar
-				*/
-				
-				clearOption.setFont(DiceBag.TEXT_FONT);
+				clearOption.setFont(Support.DEFAULT_TEXT_FONT);
 				clearOption.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_D, java.awt.Event.CTRL_MASK));
 				clearOption.setMnemonic('C');
 				clearOption.addActionListener(window);
-				openOption.setFont(DiceBag.TEXT_FONT);
+				openOption.setFont(Support.DEFAULT_TEXT_FONT);
 				openOption.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.Event.CTRL_MASK));
 				openOption.setMnemonic('O');
 				openOption.addActionListener(window);
-				saveOption.setFont(DiceBag.TEXT_FONT);
+				saveOption.setFont(Support.DEFAULT_TEXT_FONT);
 				saveOption.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.Event.CTRL_MASK));
 				saveOption.setMnemonic('S');
 				saveOption.addActionListener(window);
-				fileMenu.setFont(DiceBag.TEXT_FONT);
+				fileMenu.setFont(Support.DEFAULT_TEXT_FONT);
 				fileMenu.setMnemonic('F');
 				fileMenu.add(clearOption);
 				fileMenu.add(openOption);
 				fileMenu.add(saveOption);
-				ctOption.setFont(DiceBag.TEXT_FONT);
+				ctOption.setFont(Support.DEFAULT_TEXT_FONT);
 				ctOption.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_C, java.awt.Event.ALT_MASK));
 				ctOption.setMnemonic('C');
 				ctOption.addActionListener(window);
-				elOption.setFont(DiceBag.TEXT_FONT);
+				elOption.setFont(Support.DEFAULT_TEXT_FONT);
 				elOption.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_E, java.awt.Event.ALT_MASK));
 				elOption.setMnemonic('E');
 				elOption.addActionListener(window);
-				pbOption.setFont(DiceBag.TEXT_FONT);
+				pbOption.setFont(Support.DEFAULT_TEXT_FONT);
 				pbOption.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_P, java.awt.Event.ALT_MASK));
 				pbOption.setMnemonic('P');
 				pbOption.addActionListener(window);
-				toolsMenu.setFont(DiceBag.TEXT_FONT);
+				toolsMenu.setFont(Support.DEFAULT_TEXT_FONT);
 				toolsMenu.setMnemonic('T');
 				toolsMenu.add(ctOption);
 				toolsMenu.add(elOption);
 				toolsMenu.add(pbOption);
-				menuBar.setFont(DiceBag.TEXT_FONT);
+				menuBar.setFont(Support.DEFAULT_TEXT_FONT);
 				menuBar.add(fileMenu);
 				menuBar.add(toolsMenu);
 				window.setJMenuBar(menuBar);
-				
-				/*
-					Configure Form Elements
-				*/
-				
-				outputBox.setBackground(Color.WHITE);
 				inputBox.setEditable(true);
-				inputBox.setFont(DiceBag.TEXT_FONT);
+				inputBox.setFont(Support.DEFAULT_TEXT_FONT);
 				inputBox.setModel(new UniqueComboBoxModel());
-				inputBtn.setFont(DiceBag.TEXT_FONT);
+				inputBtn.setFont(Support.DEFAULT_TEXT_FONT);
 				inputBtn.addActionListener(window);
 				inputPanel.setLayout(new FlowLayout());
 				inputPanel.add(inputBox);
@@ -256,7 +220,6 @@ public class DiceBag implements Serializable
 				parent.setInput(inputBox);
 				parent.setOutput(outputBox);
 				window.getRootPane().setDefaultButton(inputBtn);
-				window.setFont(DiceBag.TEXT_FONT);
 			}
 		};
 		
@@ -268,12 +231,6 @@ public class DiceBag implements Serializable
 			this.getWindow().toBack();
 			this.getWindow().setVisible(false);
 		}
-	}
-	
-	public final void clearLog()
-	{
-		this.getOutput().clear();
-		this.getInput().grabFocus();
 	}
 	
 	public final JComboBox<String> getInput()
@@ -293,13 +250,7 @@ public class DiceBag implements Serializable
 	
 	public final boolean isDebugging()
 	{
-		return this.debugMode;
-	}
-	
-	public final void openLog()
-	{
-		this.getOutput().openOrSaveFile(true);
-		this.getInput().grabFocus();
+		return this.isDebugging;
 	}
 	
 	public int processInput(final String inputString)
@@ -355,15 +306,9 @@ public class DiceBag implements Serializable
 		return retVal;
 	}
 	
-	public final void saveLog()
-	{
-		this.getOutput().openOrSaveFile(false);
-		this.getInput().grabFocus();
-	}
-	
 	protected final void setDebugging(final boolean debugMode)
 	{
-		this.debugMode = debugMode;
+		this.isDebugging = debugMode;
 	}
 	
 	public final void setInput(final JComboBox<String> input)

@@ -22,12 +22,12 @@ import api.gui.RichTextPane;
 import api.util.EventHandler;
 import api.util.Support;
 
+import java.awt.AWTEvent;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.io.Serializable;
 import java.util.Collections;
@@ -44,9 +44,7 @@ import javax.swing.KeyStroke;
 public class CombatTracker implements Serializable
 {
 	private	final static long		serialVersionUID	= 1L;
-	public	final static Font		TEXT_FONT			= new Font("Lucida Console", Font.PLAIN, 14);
 	public	final static String		WINDOW_TITLE		= "Combat Tracker" + " - " + "Round: ";
-	
 	private JComboBox<Creature>		cboCreatureList		= null;
 	private LinkedList<Creature>	characterList		= null;
 	private LinkedList<Creature>	creatureList		= null;
@@ -68,287 +66,268 @@ public class CombatTracker implements Serializable
 		this.reset(1);
 		
 		// Define a self-contained ActionListener event handler.
-		EventHandler myActionPerformed = new EventHandler(this)
+		EventHandler<CombatTracker> myActionPerformed = new EventHandler<CombatTracker>(this)
 		{
-			private final static long	serialVersionUID	= 1L;
+			private final static long serialVersionUID = 1L;
 
 			@Override
-			public final void run(final Object... arguments) throws IllegalArgumentException, RuntimeException
+			public final void run(final AWTEvent event)
 			{
-				if ((arguments.length <= 1) || (arguments.length > 2))
+				ActionEvent			actionEvent	= (ActionEvent)event;
+				CombatTracker		cTracker	= this.getParent();
+				ApplicationWindow	cWindow		= cTracker.getWindow();
+				RichTextPane		output		= cTracker.getParent().getOutput();
+				Creature			current		= null;
+				Creature			target		= null;
+				
+				if (cTracker.getCboCreatureList() != null)
 				{
-					throw new IllegalArgumentException("myActionPerformed Error : incorrect number of arguments.");
-				}
-				else if (!(arguments[0] instanceof ActionEvent))
-				{
-					throw new IllegalArgumentException("myActionPerformed Error : argument[0] is of incorrect type.");
-				}
-				else if (!(arguments[1] instanceof ApplicationWindow))
-				{
-					throw new IllegalArgumentException("myActionPerformed Error : argument[1] is of incorrect type.");
+					target = (Creature)cTracker.getCboCreatureList().getSelectedItem();
 				}
 				
-				ActionEvent			event	= (ActionEvent)arguments[0];
-				ApplicationWindow	window	= (ApplicationWindow)arguments[1];
-				CombatTracker		parent	= ((CombatTracker)this.parent);
-				RichTextPane		output	= parent.getParent().getOutput();
-				Creature			current	= null;
-				Creature			target	= null;
-				
-				if (parent.getCboCreatureList() != null)
+				if (cTracker.getCurrentCreature() != null)
 				{
-					target = (Creature)parent.getCboCreatureList().getSelectedItem();
+					current = cTracker.getCurrentCreature();
 				}
 				
-				if (parent.getCurrentCreature() != null)
+				if ((target != null) && (current != null))
 				{
-					current = parent.getCurrentCreature();
-				}
-				
-				/*
-					JDK 7 allows string objects as the expression in a switch statement.
-					This generally produces more efficient byte code compared to a chain of if statements.
-					http://docs.oracle.com/javase/7/docs/technotes/guides/language/strings-switch.html
-				*/
-				switch (event.getActionCommand())
-				{
-					case "Save Target":
-						
-						if (target != null)
-						{
-							target.openOrSaveFile(parent.getWindow(), false, parent.isDebugging());
-						}
-						break;
-						
-					case "Damage Target":
-						
-						if (target != null)
-						{
-							int amount = parent.getIntegerInputString("How much?\nEnter zero to cancel.", "Damage " + target.getStatBlock().getName());
+					/*
+						JDK 7 allows string objects as the expression in a switch statement.
+						This generally produces more efficient byte code compared to a chain of if statements.
+						http://docs.oracle.com/javase/7/docs/technotes/guides/language/strings-switch.html
+					*/
+					switch (actionEvent.getActionCommand())
+					{
+						case "Save Target":
 							
-							if (amount != 0)
+							if (target != null)
 							{
-								target.damage(amount);
-								parent.getWindow().reDrawGUI();
+								target.openOrSaveFile(cWindow, false, cTracker.isDebugging());
 							}
-						}
-						break;
-					
-					case "Heal Target":
+							break;
 						
-						if (target != null)
-						{
-							int amount = parent.getIntegerInputString("How much?\nEnter zero to cancel.", "Heal " + target.getStatBlock().getName());
+						case "Damage Target":
 							
-							if (amount != 0)
+							if (target != null)
 							{
-								target.heal(amount);
-								window.reDrawGUI();
+								int amount = cTracker.getIntegerInputString("How much?\nEnter zero to cancel.", "Damage " + target.getStatBlock().getName());
+								
+								if (amount != 0)
+								{
+									target.damage(amount);
+									cWindow.reDrawGUI();
+								}
 							}
-						}
-						break;
-					
-					case "Move Target":
+							break;
 						
-						if (target != null)
-						{
-							String prevPosition = target.getStatBlock().getPosition();
-							String nextPosition = parent.getCoordinateInputString("Where to? Prompt expects X:YY coordinates." +
-								"\nEnter " + prevPosition + " to cancel.",
-								"Move " + target.getStatBlock().getName());
+						case "Heal Target":
 							
-							if (!nextPosition.equals(prevPosition))
+							if (target != null)
 							{
-								target.getStatBlock().setPosition(nextPosition);
+								int amount = cTracker.getIntegerInputString("How much?\nEnter zero to cancel.", "Heal " + target.getStatBlock().getName());
+								
+								if (amount != 0)
+								{
+									target.heal(amount);
+									cWindow.reDrawGUI();
+								}
+							}
+							break;
+						
+						case "Move Target":
+							
+							if (target != null)
+							{
+								String prevPosition = target.getStatBlock().getPosition();
+								String nextPosition = cTracker.getCoordinateInputString("Where to? Prompt expects XX:YY coordinates." +
+									"\nEnter " + prevPosition + " to cancel.",
+									"Move " + target.getStatBlock().getName());
+								
+								if (!nextPosition.equals(prevPosition))
+								{
+									target.getStatBlock().setPosition(nextPosition);
+									output.append(Color.BLACK, Color.WHITE, "[" + Support.getDateTimeStamp() + "]: ",
+										Color.BLUE, Color.WHITE, "Moving "
+											+ target.getStatBlock().getName()
+												+ " from "
+												+ prevPosition
+												+ " to "
+												+ nextPosition
+												+ ".\n\n");
+									cWindow.reDrawGUI();
+								}
+							}
+							break;
+						
+						case "Save Current":
+							
+							if (current != null)
+							{
+								current.openOrSaveFile(cTracker.getWindow(), false, cTracker.isDebugging());
+							}
+							break;
+						
+						case "Damage Current":
+							
+							if (current != null)
+							{
+								int amount = cTracker.getIntegerInputString("How much?\nEnter zero to cancel.", "Damage " + current.getStatBlock().getName());
+								
+								if (amount != 0)
+								{
+									current.damage(amount);
+									cWindow.reDrawGUI();
+								}
+							}
+							break;
+						
+						case "Heal Current":
+							
+							if (current != null)
+							{
+								int amount = cTracker.getIntegerInputString("How much?\nEnter zero to cancel.", "Heal " + current.getStatBlock().getName());
+								
+								if (amount != 0)
+								{
+									current.heal(amount);
+									cWindow.reDrawGUI();
+								}
+							}
+							break;
+						
+						case "Move Current":
+							
+							if (current != null)
+							{
+								String prevPosition = current.getStatBlock().getPosition();
+								String nextPosition = cTracker.getCoordinateInputString("Where to? Prompt expects XX:YY coordinates." +
+									"\nEnter " + prevPosition + " to cancel.",
+									"Move " + current.getStatBlock().getName());
+								if (!nextPosition.equals(prevPosition))
+								{
+									current.getStatBlock().setPosition(nextPosition);
+									output.append(Color.BLACK, Color.WHITE, "[" + Support.getDateTimeStamp() + "]: ",
+										Color.BLUE, Color.WHITE, "Moving "
+											+ current.getStatBlock().getName()
+												+ " from "
+												+ prevPosition
+												+ " to "
+												+ nextPosition
+												+ ".\n\n");
+									cWindow.reDrawGUI();
+								}
+							}
+							break;
+						
+						case "Next Combatant":
+							
+							try
+							{
+								Creature next = cTracker.nextCombatant();
+								
 								output.append(Color.BLACK, Color.WHITE, "[" + Support.getDateTimeStamp() + "]: ",
-									Color.BLUE, Color.WHITE, "Moving " + target.getStatBlock().getName() + " from " + prevPosition + " to " + nextPosition + ".\n\n");
-								window.reDrawGUI();
+									Color.BLACK, Color.WHITE, "Next Combatant:\n",
+									Color.GRAY, Color.WHITE, "\t\t\t   " + next.toString() + "\n\n");
 							}
-						}
-						break;
-						
-					case "Save Current":
-						
-						if (current != null)
-						{
-							current.openOrSaveFile(parent.getWindow(), false, parent.isDebugging());
-						}
-						break;
-						
-					case "Damage Current":
-						
-						if (current != null)
-						{
-							int amount = parent.getIntegerInputString("How much?\nEnter zero to cancel.", "Damage " + current.getStatBlock().getName());
-							
-							if (amount != 0)
+							catch (final Exception e)
 							{
-								current.damage(amount);
-								parent.getWindow().reDrawGUI();
+								break;
 							}
-						}
-						break;
+							break;
 						
-					case "Heal Current":
-						
-						if (current != null)
-						{
-							int amount = parent.getIntegerInputString("How much?\nEnter zero to cancel.", "Heal " + current.getStatBlock().getName());
-							
-							if (amount != 0)
-							{
-								current.heal(amount);
-								window.reDrawGUI();
-							}
-						}
-						break;
-						
-					case "Move Current":
-						
-						if (current != null)
-						{
-							String prevPosition = current.getStatBlock().getPosition();
-							String nextPosition = parent.getCoordinateInputString("Where to? Prompt expects X:YY coordinates." +
-								"\nEnter " + prevPosition + " to cancel.",
-								"Move " + current.getStatBlock().getName());
-							if (!nextPosition.equals(prevPosition))
-							{
-								current.getStatBlock().setPosition(nextPosition);
-								output.append(Color.BLACK, Color.WHITE, "[" + Support.getDateTimeStamp() + "]: ",
-									Color.BLUE, Color.WHITE, "Moving " + current.getStatBlock().getName() + " from " + prevPosition + " to " + nextPosition + ".\n\n");
-								window.reDrawGUI();
-							}
-						}
-						break;
-						
-					case "Next Combatant":
-						
-						try
-						{
-							Creature next = parent.nextCombatant();
+						case "Reset All Creatures":
 							
 							output.append(Color.BLACK, Color.WHITE, "[" + Support.getDateTimeStamp() + "]: ",
-								Color.BLACK, Color.WHITE, "Next Combatant:\n",
-								Color.GRAY, Color.WHITE, "\t\t\t   " + next.toString() + "\n\n");
-						}
-						catch (final Exception e)
-						{
+								Color.BLACK, Color.WHITE, "Resetting All Parameters...\n\n");
+							cTracker.reset(1);
+							cWindow.reDrawGUI();
 							break;
-						}
-						break;
-					
-					case "Reset All Creatures":
 						
-						output.append(Color.BLACK, Color.WHITE, "[" + Support.getDateTimeStamp() + "]: ",
-							Color.BLACK, Color.WHITE, "Resetting All Parameters...\n\n");
-						parent.reset(1);
-						window.reDrawGUI();
-						break;
-					
-					case "Reset Characters Only":
+						case "Reset Characters Only":
+							
+							output.append(Color.BLACK, Color.WHITE, "[" + Support.getDateTimeStamp() + "]: ",
+								Color.BLACK, Color.WHITE, "Resetting Character Parameters...\n\n");
+							cTracker.reset(2);
+							cWindow.reDrawGUI();
+							break;
 						
-						output.append(Color.BLACK, Color.WHITE, "[" + Support.getDateTimeStamp() + "]: ",
-							Color.BLACK, Color.WHITE, "Resetting Character Parameters...\n\n");
-						parent.reset(2);
-						window.reDrawGUI();
-						break;
-					
-					case "Reset Monsters Only":
+						case "Reset Monsters Only":
+							
+							output.append(Color.BLACK, Color.WHITE, "[" + Support.getDateTimeStamp() + "]: ",
+								Color.BLACK, Color.WHITE, "Resetting Monster Parameters...\n\n");
+							cTracker.reset(3);
+							cWindow.reDrawGUI();
+							break;
 						
-						output.append(Color.BLACK, Color.WHITE, "[" + Support.getDateTimeStamp() + "]: ",
-							Color.BLACK, Color.WHITE, "Resetting Monster Parameters...\n\n");
-						parent.reset(3);
-						window.reDrawGUI();
-						break;
+						default:
+							
+							break;
 					
-					default:
-						
-						break;
-				
+					}
 				}
 			}
 		};
 		
 		// Define a self-contained interface construction event handler.
-		EventHandler myDrawGUI = new EventHandler(this)
+		EventHandler<CombatTracker> myDrawGUI = new EventHandler<CombatTracker>(this)
 		{
-			private final static long	serialVersionUID	= 1L;
+			private final static long serialVersionUID = 1L;
 
 			@Override
-			public final void run(final Object... arguments) throws IllegalArgumentException
+			public final void run(final ApplicationWindow cWindow)
 			{
-				if (arguments.length <= 0)
-				{
-					throw new IllegalArgumentException("myDrawGUI Error : incorrect number of arguments.");
-				}
-				else if (!(arguments[0] instanceof ApplicationWindow))
-				{
-					throw new IllegalArgumentException("myDrawGUI Error : argument[0] is of incorrect type.");
-				}
+				CombatTracker	cTracker	= this.getParent();
+				Container		contentPane	= cWindow.getContentPane();
+				JMenuBar		menuBar		= new JMenuBar();
+				JMenu			targetMenu	= new JMenu("Target Actions");
+				JMenuItem		optSave		= new JMenuItem("Save Target");
+				JMenuItem		optDamage	= new JMenuItem("Damage Target");
+				JMenuItem		optHeal		= new JMenuItem("Heal Target");
+				JMenuItem		optMove		= new JMenuItem("Move Target");
+				JMenu			currentMenu = new JMenu("Current Actions");
+				JMenuItem		opcSave		= new JMenuItem("Save Current");
+				JMenuItem		opcDamage	= new JMenuItem("Damage Current");
+				JMenuItem		opcHeal		= new JMenuItem("Heal Current");
+				JMenuItem		opcMove		= new JMenuItem("Move Current");
+				JMenuItem		opcNext		= new JMenuItem("Next Combatant");
+				JMenu			resetMenu	= new JMenu("Reset Combat");
+				JMenuItem		oprAll		= new JMenuItem("Reset All Creatures");
+				JMenuItem		oprChars	= new JMenuItem("Reset Characters Only");
+				JMenuItem		oprMons		= new JMenuItem("Reset Monsters Only");
+				JLabel			curLabel	= new JLabel("Current: " + cTracker.getCurrentCreature().toString());
+				JPanel			curPanel	= new JPanel();
+				JLabel			cboLabel	= new JLabel("Target: ");
+				JPanel			cboPanel	= new JPanel();
 				
-				/*
-					Declare & Initialize GUI Objects 
-				*/
-				
-				ApplicationWindow	window			= (ApplicationWindow)arguments[0];
-				Container			contentPane		= window.getContentPane();
-				CombatTracker		parent			= (CombatTracker)this.parent;
-				JMenuBar			menuBar			= new JMenuBar();
-				JMenu				targetMenu		= new JMenu("Target Actions");
-				JMenuItem			optSave			= new JMenuItem("Save Target");
-				JMenuItem			optDamage		= new JMenuItem("Damage Target");
-				JMenuItem			optHeal			= new JMenuItem("Heal Target");
-				JMenuItem			optMove			= new JMenuItem("Move Target");
-				JMenu				currentMenu		= new JMenu("Current Actions");
-				JMenuItem			opcSave			= new JMenuItem("Save Current");
-				JMenuItem			opcDamage		= new JMenuItem("Damage Current");
-				JMenuItem			opcHeal			= new JMenuItem("Heal Current");
-				JMenuItem			opcMove			= new JMenuItem("Move Current");
-				JMenuItem			opcNext			= new JMenuItem("Next Combatant");
-				JMenu				resetMenu		= new JMenu("Reset Combat");
-				JMenuItem			oprAll			= new JMenuItem("Reset All Creatures");
-				JMenuItem			oprChars		= new JMenuItem("Reset Characters Only");
-				JMenuItem			oprMons			= new JMenuItem("Reset Monsters Only");
-				JLabel				curLabel		= new JLabel("Current: " + parent.getCurrentCreature().toString());
-				JPanel				curPanel		= new JPanel();
-				JLabel				cboLabel		= new JLabel("Target: ");
-				JPanel				cboPanel		= new JPanel();
-				
-				/*
-					Configure Menu Bar 
-				*/
-				
-				menuBar.setFont(CombatTracker.TEXT_FONT);
-				targetMenu.setFont(CombatTracker.TEXT_FONT);
-				optSave.setFont(CombatTracker.TEXT_FONT);
-				optSave.addActionListener(window);
-				optDamage.setFont(CombatTracker.TEXT_FONT);
-				optDamage.addActionListener(window);
-				optHeal.setFont(CombatTracker.TEXT_FONT);
-				optHeal.addActionListener(window);
-				optMove.setFont(CombatTracker.TEXT_FONT);
-				optMove.addActionListener(window);
-				
-				currentMenu.setFont(CombatTracker.TEXT_FONT);
-				opcSave.setFont(CombatTracker.TEXT_FONT);
-				opcSave.addActionListener(window);
-				opcDamage.setFont(CombatTracker.TEXT_FONT);
-				opcDamage.addActionListener(window);
-				opcHeal.setFont(CombatTracker.TEXT_FONT);
-				opcHeal.addActionListener(window);
-				opcMove.setFont(CombatTracker.TEXT_FONT);
-				opcMove.addActionListener(window);
-				opcNext.setFont(CombatTracker.TEXT_FONT);
-				opcNext.addActionListener(window);
-				
-				resetMenu.setFont(CombatTracker.TEXT_FONT);
-				oprAll.setFont(CombatTracker.TEXT_FONT);
-				oprAll.addActionListener(window);
-				oprChars.setFont(CombatTracker.TEXT_FONT);
-				oprChars.addActionListener(window);
-				oprMons.setFont(CombatTracker.TEXT_FONT);
-				oprMons.addActionListener(window);
-				
+				menuBar.setFont(Support.DEFAULT_TEXT_FONT);
+				targetMenu.setFont(Support.DEFAULT_TEXT_FONT);
+				optSave.setFont(Support.DEFAULT_TEXT_FONT);
+				optSave.addActionListener(cWindow);
+				optDamage.setFont(Support.DEFAULT_TEXT_FONT);
+				optDamage.addActionListener(cWindow);
+				optHeal.setFont(Support.DEFAULT_TEXT_FONT);
+				optHeal.addActionListener(cWindow);
+				optMove.setFont(Support.DEFAULT_TEXT_FONT);
+				optMove.addActionListener(cWindow);
+				currentMenu.setFont(Support.DEFAULT_TEXT_FONT);
+				opcSave.setFont(Support.DEFAULT_TEXT_FONT);
+				opcSave.addActionListener(cWindow);
+				opcDamage.setFont(Support.DEFAULT_TEXT_FONT);
+				opcDamage.addActionListener(cWindow);
+				opcHeal.setFont(Support.DEFAULT_TEXT_FONT);
+				opcHeal.addActionListener(cWindow);
+				opcMove.setFont(Support.DEFAULT_TEXT_FONT);
+				opcMove.addActionListener(cWindow);
+				opcNext.setFont(Support.DEFAULT_TEXT_FONT);
+				opcNext.addActionListener(cWindow);
+				resetMenu.setFont(Support.DEFAULT_TEXT_FONT);
+				oprAll.setFont(Support.DEFAULT_TEXT_FONT);
+				oprAll.addActionListener(cWindow);
+				oprChars.setFont(Support.DEFAULT_TEXT_FONT);
+				oprChars.addActionListener(cWindow);
+				oprMons.setFont(Support.DEFAULT_TEXT_FONT);
+				oprMons.addActionListener(cWindow);
 				targetMenu.setMnemonic('T');
 				optSave.setMnemonic('S');
 				optSave.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.Event.ALT_MASK));
@@ -358,7 +337,6 @@ public class CombatTracker implements Serializable
 				optHeal.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_H, java.awt.Event.ALT_MASK));
 				optMove.setMnemonic('M');
 				optMove.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_M, java.awt.Event.ALT_MASK));
-				
 				currentMenu.setMnemonic('C');
 				opcSave.setMnemonic('S');
 				opcSave.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.Event.CTRL_MASK));
@@ -370,7 +348,6 @@ public class CombatTracker implements Serializable
 				opcMove.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_M, java.awt.Event.CTRL_MASK));
 				opcNext.setMnemonic('N');
 				opcNext.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_N, java.awt.Event.CTRL_MASK));
-				
 				resetMenu.setMnemonic('R');
 				oprAll.setMnemonic('A');
 				oprAll.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, java.awt.Event.SHIFT_MASK));
@@ -378,7 +355,6 @@ public class CombatTracker implements Serializable
 				oprChars.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_C, java.awt.Event.SHIFT_MASK));
 				oprMons.setMnemonic('M');
 				oprMons.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_M, java.awt.Event.SHIFT_MASK));
-				
 				targetMenu.add(optSave);
 				targetMenu.add(optDamage);
 				targetMenu.add(optHeal);
@@ -395,42 +371,35 @@ public class CombatTracker implements Serializable
 				menuBar.add(targetMenu);
 				menuBar.add(currentMenu);
 				menuBar.add(resetMenu);
-				
-				/*
-					Configure Form Elements
-				*/
-
-				parent.setCboCreatureList(new JComboBox<Creature>());
-				parent.getCboCreatureList().setFont(CombatTracker.TEXT_FONT);
-				parent.getCboCreatureList().setEditable(false);
-				
-				cboLabel.setFont(CombatTracker.TEXT_FONT);
+				cTracker.setCboCreatureList(new JComboBox<Creature>());
+				cTracker.getCboCreatureList().setFont(Support.DEFAULT_TEXT_FONT);
+				cTracker.getCboCreatureList().setEditable(false);
+				cboLabel.setFont(Support.DEFAULT_TEXT_FONT);
 				cboPanel.setLayout(new FlowLayout());
 				cboPanel.add(cboLabel);
-				cboPanel.add(parent.getCboCreatureList());
-				curLabel.setFont(CombatTracker.TEXT_FONT);
+				cboPanel.add(cTracker.getCboCreatureList());
+				curLabel.setFont(Support.DEFAULT_TEXT_FONT);
 				curPanel.setLayout(new FlowLayout());
 				curPanel.add(curLabel);
 				contentPane.setLayout(new BorderLayout());
 				contentPane.add(curPanel, BorderLayout.NORTH);
 				contentPane.add(cboPanel, BorderLayout.CENTER);
+				cTracker.setLblCurrentCreature(curLabel);
 				
-				parent.setLblCurrentCreature(curLabel);
-				
-				for (int i = 0; i < parent.getCreatureList().size(); i++)
+				for (int i = 0; i < cTracker.getCreatureList().size(); i++)
 				{
-					parent.getCboCreatureList().addItem(parent.getCreatureList().get(i));
+					cTracker.getCboCreatureList().addItem(cTracker.getCreatureList().get(i));
 				}
 				
-				parent.getCboCreatureList().setSelectedIndex(parent.getCreatureList().indexOf(parent.getCurrentCreature()));
-				window.setJMenuBar(menuBar);
-				window.setTitle(CombatTracker.WINDOW_TITLE + parent.getNumRounds());
-				window.setFont(CombatTracker.TEXT_FONT);
+				cTracker.getCboCreatureList().setSelectedIndex(cTracker.getCreatureList().indexOf(cTracker.getCurrentCreature()));
+				cWindow.setJMenuBar(menuBar);
+				cWindow.setTitle(CombatTracker.WINDOW_TITLE + cTracker.getNumRounds());
 			}
 		};
 		
 		this.setWindow(new ApplicationWindow(this.getParent().getWindow(), CombatTracker.WINDOW_TITLE + this.getNumRounds(), new Dimension(1100, 125), 
 			this.isDebugging(), false, myActionPerformed, myDrawGUI));
+		this.getWindow().reDrawGUI();
 		this.getWindow().setIconImageByResourceName("icon.png");
 		this.getWindow().pack();
 	}
@@ -458,7 +427,7 @@ public class CombatTracker implements Serializable
 		{
 			s = this.getInputString(message, title);
 		}
-		while (!s.matches("[1-9]:[0-9][0-9]"));
+		while (!s.matches("[0-9][1-9]:[0-9][1-9]"));
 		
 		return s;
 	}
@@ -643,7 +612,7 @@ public class CombatTracker implements Serializable
 				if (this.getChoiceInput("Would you like to change this character's current position?", "Change Position?"))
 				{
 					final String position = this.getCoordinateInputString("What is the battle grid position of " + character.getStatBlock().getName() + "?" +
-						"\nPrompt expects X:YY coordinates.", "Characters Setup");
+						"\nPrompt expects XX:YY coordinates.", "Characters Setup");
 					character.getStatBlock().setPosition(position);
 				}
 				
@@ -656,7 +625,7 @@ public class CombatTracker implements Serializable
 			{
 				final String name		= this.getInputString("What is the name of character " + i + "?", "Characters Setup");
 				final String position	= this.getCoordinateInputString("What is the battle grid position of " + name + "?" +
-					"\nPrompt expects X:YY coordinates.", "Characters Setup");
+					"\nPrompt expects XX:YY coordinates.", "Characters Setup");
 				
 				final int curHealth = this.getIntegerInputString("What is the current HP of " + name + "?", "Characters Setup");
 				final int maxHealth = this.getIntegerInputString("What is the maximum HP of " + name + "?", "Characters Setup");
@@ -712,7 +681,7 @@ public class CombatTracker implements Serializable
 						if (this.getChoiceInput("Would you like to change this monster's current position?", "Change Position?"))
 						{
 							String position = this.getCoordinateInputString("What is the battle grid position of " + monster.getStatBlock().getName() + "?" +
-								"\nPrompt expects X:YY coordinates.", "Monsters Setup");
+								"\nPrompt expects XX:YY coordinates.", "Monsters Setup");
 							monster.getStatBlock().setPosition(position);
 						}
 						
@@ -737,7 +706,7 @@ public class CombatTracker implements Serializable
 					{
 						final String sequencedName = (name + " " + j);
 						final String position = this.getCoordinateInputString("What is the battle grid position of " + sequencedName + "?" +
-							"\nPrompt expects X:YY coordinates.", "Monsters Setup");
+							"\nPrompt expects XX:YY coordinates.", "Monsters Setup");
 						
 						monster = new Creature35E(this.getParent(), this, new StatBlock35E(initBonus, maxHealth, sequencedName, position));
 						
