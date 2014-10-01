@@ -17,14 +17,14 @@ public abstract class StatBlock implements Serializable
 		Fields
 	*/
 	
-	private final static long		serialVersionUID	= 1L;
-	private int						curHealth			= 0;
-	private int						initBase			= 0;
-	private int						initBonus			= 0;
-	private int						maxHealth			= 0;
-	private String					name				= "";
-	private String					position			= "";
-	private int						tieBreaker			= 0;
+	private final static long	serialVersionUID	= 1L;
+	private int					curHealth			= 0;
+	private int					initBase			= 0;
+	private int					initBonus			= 0;
+	private int					maxHealth			= 0;
+	private String				name				= "";
+	private String				position			= "";
+	private int					tieBreaker			= 0;
 	
 	/*
 		Constructor Methods

@@ -42,7 +42,7 @@ public final class Constants35E extends Constants
 	
 	public String STRING_FORMAT()
 	{
-		return "{Name: [%-24s] HP: [%03d/%03d] Initiative: [%02d] Position: [%-4s] Status: [%-10s]}";
+		return "{Name: [%-25s] HP: [%03d/%03d] Initiative: [%02d] Position: [%-5s] Status: [%-10s]}";
 	}
 	
 	public int DISABLED_HP()

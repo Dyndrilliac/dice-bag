@@ -24,7 +24,7 @@ A pre-compiled JAR binary can be downloaded from [this link](https://www.dropbox
 
 This class is an add-on module for DiceBag which allows a DM to track combat information like health, initiative, and the current round. It interfaces with the DiceBag class so that initiative die rolls are recorded in the log automatically. Currently only the v3.5 d20 rules are implemented but in a future version users will be able to seamlessly switch configurations. Saving and loading combatants is also an option, as is only resetting characters or monsters if desired.
 
-CombatTracker can also be used to track battlefield position. The input for position tracking will require the information to be in a specific format. A link to a sample blank battle grid is provided below. It features 108 squares in a 9x12 configuration using the format "X:YY" where the Y coordinate is zero-padded so each position is a single fixed width. Coordinates begin counting at one, not zero. Only positive integers are allowed.
+CombatTracker can also be used to track battlefield position. The input for position tracking will require the information to be in a specific format. A link to a sample blank battle grid is provided below. It features 770 squares in a 22x35 configuration using the format "XX:YY" where the coordinates are zero-padded so each position is a single fixed width. Coordinates begin counting at one, not zero. Only positive integers are allowed.
 
 [Sample Blank Battle Grid](https://www.dropbox.com/s/rszsx431xq87tz2/Blank_Battle_Grid.pdf)
 

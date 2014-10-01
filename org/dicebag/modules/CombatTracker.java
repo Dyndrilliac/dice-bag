@@ -427,8 +427,23 @@ public class CombatTracker implements Serializable
 		{
 			s = this.getInputString(message, title);
 		}
-		while (!s.matches("[0-9][1-9]:[0-9][1-9]"));
+		while (!s.matches("[0-9][0-9]:[0-9][0-9]"));
 		
+		final String[] coords = s.split(":");
+		
+		if ((Integer.parseInt(coords[0]) < 1) || (Integer.parseInt(coords[1]) < 1))
+		{
+			if (Integer.parseInt(coords[0]) < 1)
+			{
+				coords[0] = "01";
+			}
+			if (Integer.parseInt(coords[1]) < 1)
+			{
+				coords[1] = "01";
+			}
+			
+			s = coords[0] + ":" + coords[1];
+		}
 		return s;
 	}
 	

@@ -13,7 +13,7 @@ import java.io.Serializable;
 
 public abstract class Constants implements Serializable
 {
-	private final static long	serialVersionUID	= 1L;
+	private final static long serialVersionUID = 1L;
 	
 	public abstract String	STRING_FORMAT();
 	public abstract int		DISABLED_HP();

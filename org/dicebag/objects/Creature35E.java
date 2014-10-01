@@ -24,7 +24,7 @@ import java.io.ObjectOutputStream;
 
 public final class Creature35E extends Creature
 {
-	private final static long	serialVersionUID	= 1L;
+	private final static long serialVersionUID = 1L;
 	
 	public Creature35E(final DiceBag diceBag, final CombatTracker combatTracker, final StatBlock35E statBlock)
 	{
