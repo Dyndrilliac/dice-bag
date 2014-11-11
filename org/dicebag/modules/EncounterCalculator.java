@@ -11,6 +11,7 @@ package org.dicebag.modules;
 
 import java.io.Serializable;
 
+import api.util.Mathematics;
 import api.util.Support;
 
 public class EncounterCalculator implements Serializable
@@ -81,7 +82,7 @@ public class EncounterCalculator implements Serializable
 		}
 		else
 		{
-			retVal = (2.0 * Support.logarithm(x, 2.0));
+			retVal = (2.0 * Mathematics.logarithm(x, 2.0));
 		}
 		
 		return retVal;
@@ -89,7 +90,7 @@ public class EncounterCalculator implements Serializable
 	
 	protected static double difference(final double x, final double y)
 	{
-		return (2.0 * (Support.logarithm(x, 2.0) - Support.logarithm(y, 2.0)));
+		return (2.0 * (Mathematics.logarithm(x, 2.0) - Mathematics.logarithm(y, 2.0)));
 	}
 	
 	protected static String difficulty(final double x)
