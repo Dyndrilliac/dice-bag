@@ -253,10 +253,10 @@ public class DiceBag implements Serializable
 		return this.isDebugging;
 	}
 	
-	public int processInput(final String inputString)
+	public long processInput(final String inputString)
 	{
 		boolean	isInputBad	= true;
-		int		retVal		= -1;
+		long	retVal		= -1;
 		
 		if ((inputString != null) && (inputString.isEmpty() == false))
 		{
@@ -268,7 +268,7 @@ public class DiceBag implements Serializable
 				}
 				
 				String[]	paramArray		= inputString.split("d");
-				int[]		resultsArray	= Games.throwDice(Integer.parseInt(paramArray[0]), Integer.parseInt(paramArray[1]));
+				long[]		resultsArray	= Games.throwDice(Integer.parseInt(paramArray[0]), Integer.parseInt(paramArray[1]));
 				int			upperBound		= (resultsArray.length - 1);
 				
 				StringBuilder outputStringBuilder = new StringBuilder();

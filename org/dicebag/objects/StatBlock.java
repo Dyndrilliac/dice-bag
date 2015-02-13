@@ -18,13 +18,13 @@ public abstract class StatBlock implements Serializable
 	*/
 	
 	private final static long	serialVersionUID	= 1L;
-	private int					curHealth			= 0;
-	private int					initBase			= 0;
-	private int					initBonus			= 0;
-	private int					maxHealth			= 0;
+	private long				curHealth			= 0;
+	private long				initBase			= 0;
+	private long				initBonus			= 0;
+	private long				maxHealth			= 0;
 	private String				name				= "";
 	private String				position			= "";
-	private int					tieBreaker			= 0;
+	private long				tieBreaker			= 0;
 	
 	/*
 		Constructor Methods
@@ -53,22 +53,22 @@ public abstract class StatBlock implements Serializable
 		Getter Methods
 	*/
 	
-	public final int getCurHealth()
+	public final long getCurHealth()
 	{
 		return this.curHealth;
 	}
 	
-	public final int getInitBase()
+	public final long getInitBase()
 	{
 		return this.initBase;
 	}
 	
-	public final int getInitBonus()
+	public final long getInitBonus()
 	{
 		return this.initBonus;
 	}
 	
-	public final int getMaxHealth()
+	public final long getMaxHealth()
 	{
 		return this.maxHealth;
 	}
@@ -83,12 +83,12 @@ public abstract class StatBlock implements Serializable
 		return this.position;
 	}
 	
-	public final int getTieBreaker()
+	public final long getTieBreaker()
 	{
 		return this.tieBreaker;
 	}
 	
-	public final int getTotalInit()
+	public final long getTotalInit()
 	{
 		return (this.getInitBase() + this.getInitBonus());
 	}
@@ -97,22 +97,22 @@ public abstract class StatBlock implements Serializable
 		Setter Methods
 	*/
 	
-	public final void setCurHealth(final int curHealth)
+	public final void setCurHealth(final long curHealth)
 	{
 		this.curHealth = curHealth;
 	}
 	
-	public final void setInitBase(final int initBase)
+	public final void setInitBase(final long initBase)
 	{
 		this.initBase = initBase;
 	}
 	
-	public final void setInitBonus(final int initBonus)
+	public final void setInitBonus(final long initBonus)
 	{
 		this.initBonus = initBonus;
 	}
 	
-	public final void setMaxHealth(final int maxHealth)
+	public final void setMaxHealth(final long maxHealth)
 	{
 		this.maxHealth = maxHealth;
 	}
@@ -127,7 +127,7 @@ public abstract class StatBlock implements Serializable
 		this.position = position;
 	}
 	
-	public final void setTieBreaker(final int tieBreaker)
+	public final void setTieBreaker(final long tieBreaker)
 	{
 		this.tieBreaker = tieBreaker;
 	}

@@ -39,14 +39,14 @@ public final class Creature35E extends Creature
 		if (creature.getStatBlock().getTotalInit() != this.getStatBlock().getTotalInit())
 		{
 			// By default, the creature with the highest total initiative acts first. Turns then proceed in descending order of initiative.
-			return (creature.getStatBlock().getTotalInit() - this.getStatBlock().getTotalInit());
+			return (int)(creature.getStatBlock().getTotalInit() - this.getStatBlock().getTotalInit());
 		}
 		else
 		{
 			// If two creatures have the same total initiative, the one with the higher initiative bonus acts first.
 			if (creature.getStatBlock().getInitBonus() != this.getStatBlock().getInitBonus())
 			{
-				return (creature.getStatBlock().getInitBonus() - this.getStatBlock().getInitBonus());
+				return (int)(creature.getStatBlock().getInitBonus() - this.getStatBlock().getInitBonus());
 			}
 			else
 			{
@@ -61,7 +61,7 @@ public final class Creature35E extends Creature
 				}
 				while (creature.getStatBlock().getTieBreaker() == this.getStatBlock().getTieBreaker());
 				
-				return (creature.getStatBlock().getTieBreaker() - this.getStatBlock().getTieBreaker());
+				return (int)(creature.getStatBlock().getTieBreaker() - this.getStatBlock().getTieBreaker());
 			}
 		}
 	}
