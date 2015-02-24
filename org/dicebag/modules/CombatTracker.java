@@ -35,8 +35,8 @@ import org.dicebag.objects.Creature;
 import org.dicebag.objects.Creature35E;
 import org.dicebag.objects.StatBlock35E;
 
-import api.gui.ApplicationWindow;
-import api.gui.RichTextPane;
+import api.gui.swing.ApplicationWindow;
+import api.gui.swing.RichTextPane;
 import api.util.EventHandler;
 import api.util.Support;
 

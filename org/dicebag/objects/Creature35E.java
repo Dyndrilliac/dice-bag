@@ -19,7 +19,7 @@ import java.io.ObjectOutputStream;
 import org.dicebag.modules.CombatTracker;
 import org.dicebag.modules.DiceBag;
 
-import api.gui.RichTextPane;
+import api.gui.swing.RichTextPane;
 import api.util.Support;
 
 public final class Creature35E extends Creature
