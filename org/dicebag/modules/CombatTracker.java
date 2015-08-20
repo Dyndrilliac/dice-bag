@@ -3,10 +3,11 @@
  * Author: Matthew Boyette
  * Date: 2/19/2014
  * 
- * This class is an add-on module for DiceBag which allows a DM to track combat information like health, initiative, and the current round. It interfaces
- * with the DiceBag class so that initiative die rolls are recorded in the log automatically. Currently only the v3.5 d20 rules are implemented but in a
- * future version users will be able to seamlessly switch configurations. Saving and loading combatants is also an option, as is only resetting characters
- * or monsters if desired. CombatTracker can also be used to track battlefield position.
+ * This class is an add-on module for DiceBag which allows a DM to track combat information like health, initiative, and the current round.
+ * It interfaces with the DiceBag class so that initiative die rolls are recorded in the log automatically.
+ * Currently only the v3.5 d20 rules are implemented but in a future version users will be able to seamlessly switch configurations. 
+ * Saving and loading combatants is also an option, as is only resetting characters or monsters if desired. 
+ * CombatTracker can also be used to track battlefield position.
  */
 
 package org.dicebag.modules;
@@ -110,7 +111,8 @@ public class CombatTracker implements Serializable
 							
 							if (target != null)
 							{
-								int amount = cTracker.getIntegerInputString("How much?\nEnter zero to cancel.", "Damage " + target.getStatBlock().getName());
+								int amount = cTracker.getIntegerInputString("How much?\nEnter zero to cancel.",
+												"Damage " + target.getStatBlock().getName());
 								
 								if (amount != 0)
 								{
@@ -124,7 +126,8 @@ public class CombatTracker implements Serializable
 							
 							if (target != null)
 							{
-								int amount = cTracker.getIntegerInputString("How much?\nEnter zero to cancel.", "Heal " + target.getStatBlock().getName());
+								int amount = cTracker.getIntegerInputString("How much?\nEnter zero to cancel.",
+												"Heal " + target.getStatBlock().getName());
 								
 								if (amount != 0)
 								{
@@ -140,20 +143,15 @@ public class CombatTracker implements Serializable
 							{
 								String prevPosition = target.getStatBlock().getPosition();
 								String nextPosition = cTracker.getCoordinateInputString("Where to? Prompt expects XX:YY coordinates." +
-									"\nEnter " + prevPosition + " to cancel.",
-									"Move " + target.getStatBlock().getName());
+														"\nEnter " + prevPosition + " to cancel.",
+														"Move " + target.getStatBlock().getName());
 								
 								if (!nextPosition.equals(prevPosition))
 								{
 									target.getStatBlock().setPosition(nextPosition);
 									output.append(Color.BLACK, Color.WHITE, "[" + Support.getDateTimeStamp() + "]: ",
-										Color.BLUE, Color.WHITE, "Moving "
-											+ target.getStatBlock().getName()
-											+ " from "
-											+ prevPosition
-											+ " to "
-											+ nextPosition
-											+ ".\n\n");
+										Color.BLUE, Color.WHITE, "Moving " + target.getStatBlock().getName() + " from " +
+										prevPosition + " to " + nextPosition + ".\n\n");
 									cWindow.reDrawGUI();
 								}
 							}
@@ -171,7 +169,8 @@ public class CombatTracker implements Serializable
 							
 							if (current != null)
 							{
-								int amount = cTracker.getIntegerInputString("How much?\nEnter zero to cancel.", "Damage " + current.getStatBlock().getName());
+								int amount = cTracker.getIntegerInputString("How much?\nEnter zero to cancel.",
+												"Damage " + current.getStatBlock().getName());
 								
 								if (amount != 0)
 								{
@@ -185,7 +184,8 @@ public class CombatTracker implements Serializable
 							
 							if (current != null)
 							{
-								int amount = cTracker.getIntegerInputString("How much?\nEnter zero to cancel.", "Heal " + current.getStatBlock().getName());
+								int amount = cTracker.getIntegerInputString("How much?\nEnter zero to cancel.",
+												"Heal " + current.getStatBlock().getName());
 								
 								if (amount != 0)
 								{
@@ -207,13 +207,8 @@ public class CombatTracker implements Serializable
 								{
 									current.getStatBlock().setPosition(nextPosition);
 									output.append(Color.BLACK, Color.WHITE, "[" + Support.getDateTimeStamp() + "]: ",
-										Color.BLUE, Color.WHITE, "Moving "
-											+ current.getStatBlock().getName()
-											+ " from "
-											+ prevPosition
-											+ " to "
-											+ nextPosition
-											+ ".\n\n");
+										Color.BLUE, Color.WHITE, "Moving " + current.getStatBlock().getName() +
+										" from " + prevPosition + " to " + nextPosition + ".\n\n");
 									cWindow.reDrawGUI();
 								}
 							}
@@ -396,8 +391,8 @@ public class CombatTracker implements Serializable
 			}
 		};
 		
-		this.setWindow(new ApplicationWindow(this.getParent().getWindow(), CombatTracker.WINDOW_TITLE + this.getNumRounds(), new Dimension(1100, 125),
-			this.isDebugging(), false, myActionPerformed, myDrawGUI));
+		this.setWindow(new ApplicationWindow(this.getParent().getWindow(), CombatTracker.WINDOW_TITLE + this.getNumRounds(), 
+			new Dimension(1100, 125), this.isDebugging(), false, myActionPerformed, myDrawGUI));
 		this.getWindow().reDrawGUI();
 		this.getWindow().setIconImageByResourceName("icon.png");
 		this.getWindow().pack();
@@ -589,7 +584,8 @@ public class CombatTracker implements Serializable
 		
 		for (int i = 0; i < this.getCreatureList().size(); i++)
 		{
-			this.getParent().getOutput().append(Color.GRAY, Color.WHITE, "\t\t\t   " + this.getCreatureList().get(i).toString() + "\n");
+			this.getParent().getOutput().append(Color.GRAY, Color.WHITE, "\t\t\t   " + 
+				this.getCreatureList().get(i).toString() + "\n");
 		}
 		
 		this.getParent().getOutput().append(Color.BLACK, Color.WHITE, "\n");
@@ -611,27 +607,32 @@ public class CombatTracker implements Serializable
 		{
 			Creature character = null;
 			
-			if (this.getChoiceInput("Would you like to load a previously saved character?", "Load Previously Saved Character?"))
+			if (this.getChoiceInput("Would you like to load a previously saved character?", 
+				"Load Previously Saved Character?"))
 			{
 				character = new Creature35E(this.getParent(), this, new StatBlock35E());
 				character.openOrSaveFile(this.getWindow(), true, this.isDebugging());
 				
-				if (this.getChoiceInput("Would you like to change this character's current HP?", "Change HP?"))
+				if (this.getChoiceInput("Would you like to change this character's current HP?", 
+					"Change HP?"))
 				{
-					final int curHealth =
-						this.getIntegerInputString("What is the current HP of " + character.getStatBlock().getName() + "?", "Characters Setup");
+					final int curHealth = this.getIntegerInputString("What is the current HP of " + 
+											character.getStatBlock().getName() + "?", "Characters Setup");
 					character.getStatBlock().setCurHealth(curHealth);
 					character.updateStatus();
 				}
 				
-				if (this.getChoiceInput("Would you like to change this character's current position?", "Change Position?"))
+				if (this.getChoiceInput("Would you like to change this character's current position?", 
+					"Change Position?"))
 				{
-					final String position = this.getCoordinateInputString("What is the battle grid position of " + character.getStatBlock().getName() + "?" +
-						"\nPrompt expects XX:YY coordinates.", "Characters Setup");
+					final String position = this.getCoordinateInputString("What is the battle grid position of " + 
+												character.getStatBlock().getName() + "?" +
+												"\nPrompt expects XX:YY coordinates.", "Characters Setup");
 					character.getStatBlock().setPosition(position);
 				}
 				
-				if (this.getChoiceInput("Would you like to change this character's current initiative?", "Change Initiative?"))
+				if (this.getChoiceInput("Would you like to change this character's current initiative?", 
+					"Change Initiative?"))
 				{
 					character.rollInitiative(false);
 				}
@@ -640,13 +641,17 @@ public class CombatTracker implements Serializable
 			{
 				final String name = this.getInputString("What is the name of character " + i + "?", "Characters Setup");
 				final String position = this.getCoordinateInputString("What is the battle grid position of " + name + "?" +
-					"\nPrompt expects XX:YY coordinates.", "Characters Setup");
+											"\nPrompt expects XX:YY coordinates.", "Characters Setup");
 				
-				final int curHealth = this.getIntegerInputString("What is the current HP of " + name + "?", "Characters Setup");
-				final int maxHealth = this.getIntegerInputString("What is the maximum HP of " + name + "?", "Characters Setup");
-				final int initBonus = this.getIntegerInputString("What is the initiative modifier of " + name + "?", "Characters Setup");
+				final int curHealth = this.getIntegerInputString("What is the current HP of " + name + "?", 
+										"Characters Setup");
+				final int maxHealth = this.getIntegerInputString("What is the maximum HP of " + name + "?", 
+										"Characters Setup");
+				final int initBonus = this.getIntegerInputString("What is the initiative modifier of " + name + "?", 
+										"Characters Setup");
 				
-				character = new Creature35E(this.getParent(), this, new StatBlock35E(curHealth, initBonus, maxHealth, name, position));
+				character = new Creature35E(this.getParent(), this, 
+								new StatBlock35E(curHealth, initBonus, maxHealth, name, position));
 				character.updateStatus();
 				character.rollInitiative(false);
 			}
@@ -667,41 +672,49 @@ public class CombatTracker implements Serializable
 		
 		for (int i = 1; i <= this.getNumMonsterTypes(); i++)
 		{
-			final int numMonsters = this.getIntegerInputString("How many are there of monster type " + i + "?", "Monsters Setup");
+			final int numMonsters = this.getIntegerInputString("How many are there of monster type " + i + "?",
+				"Monsters Setup");
 			
 			if (numMonsters > 0)
 			{
 				Creature monster = null;
 				
-				if (this.getChoiceInput("Would you like to load previously saved monsters of type " + i + "?", "Load Previously Saved Monsters?"))
+				if (this.getChoiceInput("Would you like to load previously saved monsters of type " + i + "?",
+					"Load Previously Saved Monsters?"))
 				{
 					for (int j = 1; j <= numMonsters; j++)
 					{
 						monster = new Creature35E(this.getParent(), this, new StatBlock35E());
 						monster.openOrSaveFile(this.getWindow(), true, this.isDebugging());
 						
-						if (this.getChoiceInput("Would you like to rename this loaded monster in sequential order?", "Rename Loaded Monster?"))
+						if (this.getChoiceInput("Would you like to rename this loaded monster in sequential order?",
+							"Rename Loaded Monster?"))
 						{
 							final int numberIndex = (monster.getStatBlock().getName().length() - 1);
 							monster.getStatBlock().setName(monster.getStatBlock().getName().substring(0, numberIndex) + j);
 						}
 						
-						if (this.getChoiceInput("Would you like to change this monster's current HP?", "Change HP?"))
+						if (this.getChoiceInput("Would you like to change this monster's current HP?",
+							"Change HP?"))
 						{
-							final int curHealth =
-								this.getIntegerInputString("What is the current HP of " + monster.getStatBlock().getName() + "?", "Monsters Setup");
+							final int curHealth = this.getIntegerInputString("What is the current HP of " + 
+													monster.getStatBlock().getName() + "?", "Monsters Setup");
 							monster.getStatBlock().setCurHealth(curHealth);
 							monster.updateStatus();
 						}
 						
-						if (this.getChoiceInput("Would you like to change this monster's current position?", "Change Position?"))
+						if (this.getChoiceInput("Would you like to change this monster's current position?",
+							"Change Position?"))
 						{
-							String position = this.getCoordinateInputString("What is the battle grid position of " + monster.getStatBlock().getName() + "?" +
-								"\nPrompt expects XX:YY coordinates.", "Monsters Setup");
+							String position = this.getCoordinateInputString("What is the battle grid position of " + 
+												monster.getStatBlock().getName() + "?" +
+												"\nPrompt expects XX:YY coordinates.",
+												"Monsters Setup");
 							monster.getStatBlock().setPosition(position);
 						}
 						
-						if (this.getChoiceInput("Would you like to change this monster's current initiative?", "Change Initiative?"))
+						if (this.getChoiceInput("Would you like to change this monster's current initiative?",
+							"Change Initiative?"))
 						{
 							monster.rollInitiative(false);
 						}
@@ -714,22 +727,28 @@ public class CombatTracker implements Serializable
 				}
 				else
 				{
-					final String name = this.getInputString("What is the name of monster type " + i + "?", "Monsters Setup");
-					final int maxHealth = this.getIntegerInputString("What is the maximum HP of monster type " + i + "?", "Monsters Setup");
-					final int initBonus = this.getIntegerInputString("What is the initiative modifier of monster type " + i + "?", "Monsters Setup");
+					final String name = this.getInputString("What is the name of monster type " + i + "?",
+											"Monsters Setup");
+					final int maxHealth = this.getIntegerInputString("What is the maximum HP of monster type " + i + "?",
+											"Monsters Setup");
+					final int initBonus = this.getIntegerInputString("What is the initiative modifier of monster type " + i + "?",
+											"Monsters Setup");
 					
 					for (int j = 1; j <= numMonsters; j++)
 					{
 						final String sequencedName = (name + " " + j);
-						final String position = this.getCoordinateInputString("What is the battle grid position of " + sequencedName + "?" +
-							"\nPrompt expects XX:YY coordinates.", "Monsters Setup");
+						final String position = this.getCoordinateInputString("What is the battle grid position of " + 
+													sequencedName + "?\nPrompt expects XX:YY coordinates.", 
+													"Monsters Setup");
 						
-						monster = new Creature35E(this.getParent(), this, new StatBlock35E(initBonus, maxHealth, sequencedName, position));
+						monster = new Creature35E(this.getParent(), this, new StatBlock35E(initBonus, maxHealth, 
+									sequencedName, position));
 						
-						if (this.getChoiceInput("Would you like to change this monster's current HP?", "Change HP?"))
+						if (this.getChoiceInput("Would you like to change this monster's current HP?",
+							"Change HP?"))
 						{
-							final int curHealth =
-								this.getIntegerInputString("What is the current HP of " + monster.getStatBlock().getName() + "?", "Monsters Setup");
+							final int curHealth = this.getIntegerInputString("What is the current HP of " + 
+													monster.getStatBlock().getName() + "?", "Monsters Setup");
 							monster.getStatBlock().setCurHealth(curHealth);
 						}
 						

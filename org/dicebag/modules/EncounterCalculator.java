@@ -4,7 +4,7 @@
  * Date: 4/10/2014
  * 
  * This simple module calculates encounter levels, standard XP rewards, and standard treasure rewards based on the number of enemies
- * and the challenge ratings.
+ * and their challenge ratings.
  */
 
 package org.dicebag.modules;
@@ -18,47 +18,13 @@ public class EncounterCalculator implements Serializable
 {
 	private final static long		serialVersionUID	= 1L;
 	
-	protected final static int[]	TREASURE			= {
-														300,
-														600,
-														900,
-														1200,
-														1600,
-														2000,
-														2600,
-														3400,
-														4500,
-														5800,
-														7500,
-														9800,
-														13000,
-														17000,
-														22000,
-														28000,
-														36000,
-														47000,
-														61000,
-														80000,
-														87000,
-														96000,
-														106000,
-														116000,
-														128000,
-														141000,
-														155000,
-														170000,
-														187000,
-														206000,
-														227000,
-														249000,
-														274000,
-														302000,
-														332000,
-														365000,
-														401000,
-														442000,
-														486000,
-														534000};
+	protected final static int[]	TREASURE			= {300, 600, 900, 1200, 1600, 2000,
+														2600, 3400, 4500, 5800, 7500, 9800,
+														13000, 17000, 22000, 28000, 36000, 47000,
+														61000, 80000, 87000, 96000, 106000, 116000,
+														128000, 141000, 155000, 170000, 187000, 206000,
+														227000, 249000, 274000, 302000, 332000, 365000,
+														401000, 442000, 486000, 534000};
 	
 	protected static double CRtoPL(final double x)
 	{
@@ -517,9 +483,9 @@ public class EncounterCalculator implements Serializable
 		return EncounterCalculator.xDyPz(x, y, 0.0);
 	}
 	
-	protected static long xDyPz(final double x, final double y, final double z)
+	protected static int xDyPz(final double x, final double y, final double z)
 	{
-		long temp = ((long)z);
+		int temp = ((int)z);
 		
 		for (int j = ((int)x); j > 0; j--)
 		{

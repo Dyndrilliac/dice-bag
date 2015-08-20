@@ -54,7 +54,8 @@ public class DiceBag implements Serializable
 		}
 	}
 	
-	public final static String	INPUT_EXCEPTION_STRING	= "Incorrect input format! Provide two non-negative integers separated by the character 'd'." +
+	public final static String	INPUT_EXCEPTION_STRING	= "Incorrect input format!" +
+															"Provide two non-negative integers separated by the character 'd'." +
 															"\nThe 'd' is not case sensitve." +
 															"\nExamples: 3d6, 2d8, 1d20, 15D6, 10D10, 4D4, etc.";
 	
@@ -224,7 +225,8 @@ public class DiceBag implements Serializable
 			}
 		};
 		
-		this.setWindow(new ApplicationWindow(null, "Dice Bag", new Dimension(1100, 600), this.isDebugging(), true, myActionPerformed, myDrawGUI));
+		this.setWindow(new ApplicationWindow(null, "Dice Bag", new Dimension(1100, 600), this.isDebugging(), true,
+			myActionPerformed, myDrawGUI));
 		this.getWindow().setIconImageByResourceName("icon.png");
 		
 		if (!showWindow)
