@@ -170,15 +170,15 @@ public class DiceBag implements Serializable
                 JPanel inputPanel = new JPanel();
                 
                 clearOption.setFont(Support.DEFAULT_TEXT_FONT);
-                clearOption.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_D, java.awt.Event.CTRL_MASK));
+                clearOption.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_D, java.awt.event.KeyEvent.CTRL_DOWN_MASK));
                 clearOption.setMnemonic('C');
                 clearOption.addActionListener(window);
                 openOption.setFont(Support.DEFAULT_TEXT_FONT);
-                openOption.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.Event.CTRL_MASK));
+                openOption.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.KeyEvent.CTRL_DOWN_MASK));
                 openOption.setMnemonic('O');
                 openOption.addActionListener(window);
                 saveOption.setFont(Support.DEFAULT_TEXT_FONT);
-                saveOption.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.Event.CTRL_MASK));
+                saveOption.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.KeyEvent.CTRL_DOWN_MASK));
                 saveOption.setMnemonic('S');
                 saveOption.addActionListener(window);
                 fileMenu.setFont(Support.DEFAULT_TEXT_FONT);
@@ -187,15 +187,15 @@ public class DiceBag implements Serializable
                 fileMenu.add(openOption);
                 fileMenu.add(saveOption);
                 ctOption.setFont(Support.DEFAULT_TEXT_FONT);
-                ctOption.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_C, java.awt.Event.ALT_MASK));
+                ctOption.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_C, java.awt.event.KeyEvent.ALT_DOWN_MASK));
                 ctOption.setMnemonic('C');
                 ctOption.addActionListener(window);
                 elOption.setFont(Support.DEFAULT_TEXT_FONT);
-                elOption.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_E, java.awt.Event.ALT_MASK));
+                elOption.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_E, java.awt.event.KeyEvent.ALT_DOWN_MASK));
                 elOption.setMnemonic('E');
                 elOption.addActionListener(window);
                 pbOption.setFont(Support.DEFAULT_TEXT_FONT);
-                pbOption.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_P, java.awt.Event.ALT_MASK));
+                pbOption.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_P, java.awt.event.KeyEvent.ALT_DOWN_MASK));
                 pbOption.setMnemonic('P');
                 pbOption.addActionListener(window);
                 toolsMenu.setFont(Support.DEFAULT_TEXT_FONT);
